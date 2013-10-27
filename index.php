@@ -1140,18 +1140,29 @@ $daytotals = getDayTotal();
             });
 
 
-            $("#combinedsearch").bind('input keyup', function(){
+            $("#csholder > .bootstrap-tagsinput > input").bind('input keyup', function(){
                 var $this = $(this);
-                var delay = 200; // 2 seconds delay after last input
+                var delay = 200; // 0.2 seconds delay after last input
 
                 clearTimeout($this.data('timer'));
                 $this.data('timer', setTimeout(function(){
+
+                    console.log($("#combinedsearch").val());
+                    console.log($this.val());
+
                     $this.removeData('timer');
                     if($this.val()!=""){
-                        loadStats({terms:$this.val(),tags:$this.val()});
+                        if(($("#combinedsearch").val()=="")||($("#combinedsearch").val()==$this.val())){
+                            loadStats({terms:$this.val()});
+                        }
+                        else{
+                            loadStats({terms:$("#combinedsearch").val()+","+$this.val()});
+                        }
                     }
                     else{
-                        loadStats({});
+                        if($("#combinedsearch").val()!=""){
+                            loadStats({terms:$("#combinedsearch").val()});
+                        }
                     }
                 }, delay));
             });
