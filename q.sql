@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Servidor: localhost
--- Tiempo de generación: 27-10-2013 a las 16:22:45
+-- Tiempo de generación: 27-10-2013 a las 16:27:28
 -- Versión del servidor: 5.5.20
 -- Versión de PHP: 5.3.10
 
@@ -19,6 +19,8 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `q`
 --
+CREATE DATABASE `q` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+USE `q`;
 
 -- --------------------------------------------------------
 
