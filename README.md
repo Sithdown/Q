@@ -1,4 +1,6 @@
 Q
 =
 
-Q is an activity time tracking and stats tool. It's also an ugly hack.
+Q attempts to be an activity time tracking and stats tool.
+
+You can try a demo here: http://github.sithdown.kd.io/github/Q/ (not always on)
