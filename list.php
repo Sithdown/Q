@@ -6,8 +6,7 @@ echo json_encode(matchCriteria());
 
 function getDayTotal($gets=null){
 
-    global $user, $pass;
-    $pdo = new PDO('mysql:host=localhost;dbname=q', $user, $pass);
+    global $pdo;
 
 	if($gets!==null){
 		$sql=array();
@@ -159,8 +158,7 @@ function stringSearch($field="", $array=array(), $p=array(),$startand=false){
 }
 
 function matchCriteria() {
-	global $user, $pass;
-	$pdo = new PDO('mysql:host=localhost;dbname=q', $user, $pass);
+	global $pdo;
 	$sql=array();
 	$paramArray=array();
 	$something = false;

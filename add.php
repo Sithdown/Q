@@ -5,8 +5,7 @@ require_once "connection.php";
 echo json_encode(add());
 
 function add() {
-	global $user, $pass;
-	$pdo = new PDO('mysql:host=localhost;dbname=q', $user, $pass);
+	global $pdo;
 	$sql=array();
 	$paramArray=array();
 

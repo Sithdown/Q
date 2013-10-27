@@ -4,8 +4,7 @@ require_once "connection.php";
 
 function getData($data){
 
-    global $user, $pass;
-    $pdo = new PDO('mysql:host=localhost;dbname=q', $user, $pass);
+    global $pdo;
     $insert = 'SELECT * FROM '.$data;
     $ready = $pdo->prepare($insert);
     $result = $ready->execute();
@@ -21,8 +20,7 @@ function getData($data){
 
 function getDayTotal(){
 
-    global $user, $pass;
-    $pdo = new PDO('mysql:host=localhost;dbname=q', $user, $pass);
+    global $pdo;
     $insert = 'SELECT DAY(datetime) AS monthday, DATE(datetime) as date, SUM(duration) AS duration_total FROM logs WHERE YEAR(datetime) = YEAR(CURDATE()) AND MONTH(datetime) = MONTH(CURDATE()) GROUP BY YEAR(datetime), MONTH(datetime), DAY(datetime)';
     
     $ready = $pdo->prepare($insert);
