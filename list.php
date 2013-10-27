@@ -145,7 +145,8 @@ function stringSearch($field="", $array=array(), $p=array(),$startand=false){
 		}
 		$r.=$field." LIKE :".strtolower($field).$key;
 
-		$p[':'.strtolower($field).$key] = '%'.mb_ereg_replace("[\.]","",$value).'%';
+		$p[':'.strtolower($field).$key] = '%'.$value.'%';
+		//$p[':'.strtolower($field).$key] = '%'.mb_ereg_replace("[\.]","",$value).'%';
 
 	}
 	if($startand!==true){
