@@ -1,0 +1,93 @@
+/* Ion.RangeSlider, Flat UI Skin
+// css version 1.8.1
+// by Denis Ineshin | ionden.com
+// ===================================================================================================================*/
+
+/* =====================================================================================================================
+// Skin details */
+
+
+.irs {
+    height: 56px;
+    background-color: #eee;
+}
+.irs-with-grid {
+    height: 76px;
+    background-color: #eee;
+}
+.irs-line {
+    height: 24px; top: 32px;
+}
+    .irs-line-left {
+        height: 24px;
+        background-color: #fff;
+    }
+    .irs-line-mid {
+        height: 24px;
+        background-color: #fff;
+    }
+    .irs-line-right {
+        height: 24px;
+        background-color: #fff;
+    }
+
+.irs-diapason {
+    height: 12px; top: 25px;
+    background-color: #d2322d;
+}
+
+.irs-slider {
+    width: 28px;
+    height: 28px;
+    top: 30px;
+    background-color: #d9534f;
+    border-radius: 3px;
+}
+#irs-active-slider, .irs-slider:hover {
+    background-color: #d2322d;
+    cursor: pointer;
+}
+
+.irs-slider.single:before {
+    width: 200%;
+    left: -50%;
+}
+
+.irs-min, .irs-max {
+    color: #999;
+    font-size: 12px; line-height: 1.333;
+    text-shadow: none;
+    top: 0; padding: 1px 3px;
+    background: transparent;
+}
+
+.irs-from, .irs-to, .irs-single {
+    color: #fff;
+    font-size: 12px;
+    line-height: 1.333;
+    text-shadow: none;
+    padding: 5px 5px;
+    background: #d9534f;
+    border-radius: 4px;
+}
+.irs-from:after, .irs-to:after, .irs-single:after {
+    position: absolute; display: block; content: "";
+    bottom: -6px; left: 50%;
+    width: 0; height: 0;
+    margin-left: -3px;
+    overflow: hidden;
+    border: 3px solid transparent;
+    border-top-color: #d9534f;
+}
+
+.irs-single{
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.irs-grid-pol {
+    background: #e1e4e9;
+}
+.irs-grid-text {
+    color: #999;
+}
