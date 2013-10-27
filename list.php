@@ -1,7 +1,6 @@
 <?php header('Content-type: application/json');
 
-$user = "";
-$pass = "";
+require_once "connection.php";
 
 echo json_encode(matchCriteria());
 

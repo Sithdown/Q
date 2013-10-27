@@ -1,7 +1,6 @@
 <?php
 
-$user = "";
-$pass = "";
+require_once "connection.php";
 
 function getData($data){
 
