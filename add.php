@@ -11,7 +11,7 @@ function add() {
 
 	$posts = $_POST;
 
-	$insert = "INSERT INTO logs (`ID`,`datetime`,`duration`,`type`,`description`,`tags`,`mood`) VALUES (NULL, :datetime, :duration, :type, :description, :tags, :mood)";
+	$insert = "INSERT INTO logs (`ID`,`datetime`,`duration`,`description`,`tags`,`mood`) VALUES (NULL, :datetime, :duration, :description, :tags, :mood)";
 
 	$ready = $pdo->prepare($insert);
 	$result = $ready->execute(prepareData($posts,$insert));
@@ -23,7 +23,6 @@ function prepareData($object,$ins){
 	$result = array(
 		":datetime" => $object["datetime"],
 		":duration" => $object["duration"],
-		":type" => $object["type"],
 		":description" => utf8_decode($object["description"]),
 		":tags" => utf8_decode($object["tags"]),
 		":mood" => $object["mood"],

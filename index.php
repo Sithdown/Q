@@ -45,7 +45,6 @@ function pTime($minutes){
     return $r;
 }
 
-$types = getData("types");
 $moods = getData("moods");
 $daytotals = getDayTotal();
 
@@ -145,27 +144,6 @@ $daytotals = getDayTotal();
                             </div>
 
                             <div class="form-group">
-                                <label for="type" class="col-md-4 control-label">Tipo</label>
-                                <div class="col-md-4">
-                                    <select class="form-control selectpicker" style="display: none;" name="type" id="type">
-                                      <option value="0">-</option>
-                                      <?php
-                                      $icons = array("fa-book","fa-code","fa-crop","fa-leaf","fa-trophy","fa-tasks","fa-group");
-                                       foreach ($types as $key => $value) {
-                                        if(isset($icons[$key])){
-                                            $w = " data-icon='fa fa-lg fa-fw ".$icons[$key]."'";
-                                        }
-                                        else{
-                                            $w = "";
-                                        }
-                                       ?>
-                                      <option<?php echo $w;?> value="<?php echo $value["ID"];?>"><?php echo utf8_encode(ucfirst($value["name"]));?></option>
-                                      <?php } ?>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
                                 <label for="description" class="col-md-4 control-label">Descripción</label>
                                 <div class="col-md-4">
                                     <textarea class="form-control" rows="3" name="description" id="description"></textarea>
@@ -228,9 +206,11 @@ $daytotals = getDayTotal();
                                 <div class="form-group col-md-4" id="csholder">
                                     <input id="combinedsearch" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" class="form-control" placeholder="Búsqueda">
                                 </div>
+                                <!--
                                 <div class="form-group col-md-4">
                                     <input spellcheck="false" autocomplete="off" autocapitalize="off" type="text" class="col-md-4 form-control" name="tagfs" id="tafgs" data-role="tagsinput"></input>
                                 </div>
+                                -->
                             </form>
                         </div>
                     </nav>
@@ -427,36 +407,6 @@ $daytotals = getDayTotal();
                 $("body").removeClass("padd");
             });
 
-            $("#type").change(function(){
-                var types = [];
-                <?php
-                $tt=array();
-                foreach ($types as $key => $value) {
-                    echo "types[".$key."] = '".utf8_encode($value["relatedTags"])."';\n";
-                }
-
-                ?>
-                tg.tagsinput('input').typeahead('destroy');
-                if($("#type").val()>0){
-                    tg.tagsinput('input').typeahead({
-                        local: types[$("#type").val()-1].split(","),
-                        freeInput: true
-                    }).bind('typeahead:selected', $.proxy(function (obj, datum) {  
-                        this.tagsinput('add', datum.value);
-                        this.tagsinput('input').typeahead('setQuery', '');
-                    }, tg));
-                }
-                else{
-                    tg.tagsinput('input').typeahead({
-                        local: [],
-                        freeInput: true
-                    }).bind('typeahead:selected', $.proxy(function (obj, datum) {  
-                        this.tagsinput('add', datum.value);
-                        this.tagsinput('input').typeahead('setQuery', '');
-                    }, tg));
-                }
-            });
-
             function loadStats(options){
 
                 if($.isEmptyObject(options)){
@@ -484,15 +434,6 @@ $daytotals = getDayTotal();
 
                 var meses = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
                 var icoMoods = ["fa-heart-o text-info","fa-smile-o text-success","fa-meh-o text-warning","fa-frown-o text-danger","fa-times text-danger"];
-                var icoTypes = ["fa-book","fa-code","fa-crop","fa-leaf","fa-trophy","fa-tasks","fa-group"];
-
-                var types = [];
-                <?php
-                foreach ($types as $key => $value) {
-                    echo "types[".$key."] = '".utf8_encode($value["name"])."';\n";
-                }
-
-                ?>
 
                 var moods = [];
                 <?php
@@ -548,14 +489,13 @@ $daytotals = getDayTotal();
                             var time = dt[1];
 
                             var icoMood = "<i onclick='searchmood("+val["mood"]+")' class='clickable fa "+icoMoods[val["mood"]-1]+"'></i>";
-                            var icoType = "<i onclick='searchtype("+val["type"]+")' class='clickable fa "+icoTypes[val["type"]-1]+"'></i>";
 
                             if(curday!=day){
                                 var kk = "";
                                 if(curday!=0){
                                     var kk = "</tbody></table><table class='col-md-4 table table-striped' style='text-align:center;background-color:#FAFAFA;'>";
                                 }
-                                items.push(kk+"<thead><tr><td colspan='5' style='text-align:left;'><h2><i class='fa fa-calendar-o'></i> "+day+" "+mn+"</h2></td></tr></thead><tbody>");
+                                items.push(kk+"<thead><tr><td colspan='4' style='text-align:left;'><h2><i class='fa fa-calendar-o'></i> "+day+" "+mn+"</h2></td></tr></thead><tbody>");
                                 curday = day;
                             }
 
@@ -569,7 +509,7 @@ $daytotals = getDayTotal();
                             }
 
 
-                            items.push("<tr id='log_"+val["ID"]+"'><td onclick='searchduration("+val["duration"]+")' class='col-md-1 clickable' title='"+val["datetime"]+"'>"+pTime(val["duration"])+"</td><td class='col-md-1' title='"+types[val["type"]-1][0].toUpperCase()+types[val["type"]-1].slice(1)+"'>"+icoType+"</td><td class='col-md-6'>"+val["description"]+"</td><td class='col-md-1' title='"+moods[val["mood"]-1][0].toUpperCase()+moods[val["mood"]-1].slice(1)+"'>"+icoMood+"</td><td class='col-md-3'>"+t+"</td></tr>");
+                            items.push("<tr id='log_"+val["ID"]+"'><td onclick='searchduration("+val["duration"]+")' class='col-md-1 clickable' title='"+val["datetime"]+"'>"+pTime(val["duration"])+"</td><td class='col-md-7'>"+val["description"]+"</td><td class='col-md-1' title='"+moods[val["mood"]-1][0].toUpperCase()+moods[val["mood"]-1].slice(1)+"'>"+icoMood+"</td><td class='col-md-3'>"+t+"</td></tr>");
                         });
 
                         var bars = "";
@@ -653,14 +593,7 @@ $daytotals = getDayTotal();
                                         //v+=' <span class="label label-default">'+val+'</span>';
                                     });
                                 }
-                                if(key=="type"){
-                                    var vv = (v+"").split(",");
-                                    v = 'Actividades de';
-                                    $.each(vv, function(ke, val){
-                                        v+=' <span class="label label-default">'+types[val-1][0].toUpperCase()+types[val-1].slice(1)+'</span>';
-                                        //v+=' <span class="label label-default">'+val+'</span>';
-                                    });
-                                }
+ 
                                 bread+='<li><a href="#" onclick="loadStats({'+key+':\''+value+'\'});">'+v+'</a></li>';
                             });
 
@@ -728,14 +661,7 @@ $daytotals = getDayTotal();
                                     v+=' <span class="label label-default">'+moods[val-1][0].toUpperCase()+moods[val-1].slice(1)+'</span>';
                                 });
                             }
-                            if(key=="type"){
-                                var vv = (v+"").split(",");
-                                v = 'Actividades de';
-                                $.each(vv, function(ke, val){
-                                    v+=' <span class="label label-default">'+types[val-1][0].toUpperCase()+types[val-1].slice(1)+'</span>';
 
-                                });
-                            }
                             bread+='<li><a href="#" onclick="loadStats({'+key+':\''+value+'\'});">'+v+'</a></li>';
                         });
                         $("#stats").html(bread+'</ol><div class="alert alert-default"><h1>No se han encontrado resultados.</h1></div>');
@@ -747,7 +673,6 @@ $daytotals = getDayTotal();
 
                     $('.progress-bar').progressbar();
 
-                    //$("#combinedsearch").focus();
                     $("#csholder > .bootstrap-tagsinput > input").focus();
                     $("#csholder > .bootstrap-tagsinput > input").attr("placeholder",$("#combinedsearch").attr("placeholder"));
 
@@ -779,13 +704,13 @@ $daytotals = getDayTotal();
               var $form = $( this ),
               datetime = $form.find( "input[name='datetime']" ).val(),
               duration = $form.find( "input[name='duration']" ).val(),
-              type = $form.find( "select[name='type']" ).val(),
+
               description = $form.find( "textarea[name='description']" ).val(),
               mood = $form.find( "select[name='mood']" ).val(),
               tags = $form.find( "input[name='tags']" ).val(),
               url = $form.attr( "action" );
 
-              if((datetime)&&(duration)&&(type!=0)){
+              if((datetime)&&(duration)){
 
                 // Send the data using post
                 $.post( url, $form.serialize() )
@@ -795,7 +720,6 @@ $daytotals = getDayTotal();
                         instance_datetime.datetimepicker('update', new Date());
                         instance_duration.ionRangeSlider("update", {from:0});
 
-                        $form.find( "select[name='type']" ).selectpicker('val','0');
                         $form.find( "textarea[name='description']" ).val("");
                         $form.find( "select[name='mood']" ).selectpicker('val','1');
                         $form.find( "input[name='tags']" ).val("");
@@ -832,10 +756,6 @@ $daytotals = getDayTotal();
 
             function searchtag(value){
                 loadStats({tags:value});
-            }
-
-            function searchtype(value){
-                loadStats({type:value});
             }
 
             function searchmood(value){

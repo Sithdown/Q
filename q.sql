@@ -32,7 +32,6 @@ CREATE TABLE IF NOT EXISTS `logs` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `datetime` datetime NOT NULL,
   `duration` smallint(5) unsigned NOT NULL,
-  `type` int(10) unsigned NOT NULL,
   `description` text COLLATE utf8_unicode_ci NOT NULL,
   `tags` text COLLATE utf8_unicode_ci NOT NULL,
   `mood` int(11) NOT NULL,
@@ -48,19 +47,6 @@ CREATE TABLE IF NOT EXISTS `logs` (
 CREATE TABLE IF NOT EXISTS `moods` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` tinytext COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `types`
---
-
-CREATE TABLE IF NOT EXISTS `types` (
-  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` tinytext COLLATE utf8_unicode_ci NOT NULL,
-  `relatedTags` text COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
