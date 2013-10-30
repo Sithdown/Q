@@ -66,6 +66,43 @@ span.hint{
     }
 }
 
+#toggleTrack{
+    min-width: 220px;
+    width: 360px;
+    height: 164px;
+    outline: 0;
+    border-width: 1px;
+    border-color: #d2322d;
+    box-sizing: border-box;
+    transition: all 0.3s;
+}
+
+#toggleTrack:active,
+#toggleTrack:focus{
+    outline: 0;
+}
+
+@keyframes pulse
+{
+    from {background: #d2322d;border-width: 0px;border-color: #d2322d;width:220px;height:220px;margin-top:0;margin-bottom:0px;}
+    to {background: #ac2925;border-width: 5px;border-color: #ac2925;width:230px;height:230px;margin-top:-5px;margin-bottom:-5px;}
+}
+
+@-webkit-keyframes pulse{
+    from {background: #d2322d;border-width: 0px;border-color: #d2322d;width:220px;height:220px;margin-top:0;margin-bottom:0px;}
+    to {background: #ac2925;border-width: 5px;border-color: #ac2925;width:230px;height:230px;margin-top:-5px;margin-bottom:-5px;}
+}
+
+#toggleTrack.tracking{
+    border-radius: 100%;
+    width: 220px;
+    height: 220px;
+    margin: auto;
+    transition: all 0.3s;
+    animation: pulse 1s linear 0.5s infinite alternate;
+    -webkit-animation: pulse 1s linear 0.5s infinite alternate;
+}
+
 
 .navbar-inverse{
     background-color:rgba(34, 34, 34, 0.98);
@@ -171,6 +208,10 @@ textarea.form-control {
     max-width: 100%;
     line-height: 36px;
     font-size: 16px;
+}
+
+.bootstrap-tagsinput:hover{
+    cursor: text;
 }
 
 .bootstrap-tagsinput input {

@@ -127,58 +127,73 @@ $daytotals = getDayTotal();
                 <div class="tab-pane active" id="add">
                     <form id="addform" action="add.php" class="form-horizontal"  role="form">
                         <fieldset>
-                            <div class="form-group">
-                                <label for="datetime" class="col-md-4 control-label">Fecha</label>
-                                <div class="input-group date form_datetime col-md-4" data-date="" data-date-format="dd MM yyyy - HH:ii p" data-link-field="datetime">
-                                    <input class="form-control" size="16" type="text" value="" readonly>
-                                    <span class="input-group-addon"><i class="fa fa-times"></i></span>
-                                    <span class="input-group-addon"><i class="fa fa-th fa-calendar"></i></span>
-                                </div>
-                                <input type="hidden" id="datetime" name="datetime" value="" /><br/>
-                            </div>
-                            <div class="form-group">
-                                <label for="duration" class="col-md-4 control-label">Duración</label>
-                                <div class="input-grodup col-md-4">
-                                    <input name="duration" id="duration" class="form-control" size="16" type="text">
+                            <div class="form-group time-basic">
+                                <div class="col-md-offset-4 col-md-4">
+                                    <button id="toggleTrack" class="btn btn-danger btn-block"><p style="font-size:4em;"></p><span>Start tracking</span></button>
+                                    <br>
+                                    <p style="color:white;font-size:2em;text-align:center;">or</p>
+                                    <br>
+                                    <button class="btn btn-danger btn-block" data-toggle="collapse" data-target="#finetune">Fine tune</button>
                                 </div>
                             </div>
+                            <div id="finetune" class="collapse">
+                                <div class="form-group time-advanced">
+                                    <label for="datetime" class="col-md-4 control-label">Fecha</label>
+                                    <div class="input-group date form_datetime col-md-4" data-date="" data-date-format="dd MM yyyy - HH:ii p" data-link-field="datetime">
+                                        <input class="form-control" size="16" type="text" value="" readonly>
+                                        <span class="input-group-addon"><i class="fa fa-times"></i></span>
+                                        <span class="input-group-addon"><i class="fa fa-th fa-calendar"></i></span>
+                                    </div>
+                                    <input type="hidden" id="datetime" name="datetime" value="" /><br/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="duration" class="col-md-4 control-label">Duración</label>
+                                    <div class="input-grodup col-md-4">
+                                        <input name="duration" id="duration" class="form-control" size="16" type="text">
+                                    </div>
+                                </div>
 
-                            <div class="form-group">
-                                <label for="description" class="col-md-4 control-label">Descripción</label>
-                                <div class="col-md-4">
-                                    <textarea class="form-control" rows="3" name="description" id="description"></textarea>
+                                <div class="form-group">
+                                    <label for="description" class="col-md-4 control-label">Descripción</label>
+                                    <div class="col-md-4">
+                                        <textarea class="form-control" rows="3" name="description" id="description"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="mood" class="col-md-4 control-label">Sensación</label>
+                                    <div class="col-md-4">
+                                        <select class="form-control selectpicker" style="display: none;" name="mood" id="mood">
+                                          <?php
+                                          $m = array("fa-heart-o text-info","fa-smile-o text-success","fa-meh-o text-warning","fa-frown-o text-danger","fa-times text-danger");
+                                          foreach ($moods as $key => $value) {
+                                            if(isset($m[$key])){
+                                                $w = " data-icon='fa fa-lg fa-fw ".$m[$key]."'";
+                                            }
+                                            else{
+                                                $w = "";
+                                            }
+                                          ?>
+                                          <option<?php echo $w;?>  value="<?php echo $value["ID"];?>"><?php echo utf8_encode(ucfirst($value["name"]));?></option>
+                                          <?php } ?>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="tags" class="col-md-4 control-label">Etiquetas</label>
+                                    <div class="col-md-4">
+                                        <input spellcheck="false" autocomplete="off" autocapitalize="off" type="text" class="col-md-4 form-control" name="tags" id="tags" data-role="tagsinput"></input>
+                                    </div>
+                                    <div class="col-md-4" id="exampletags"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-offset-4 col-md-4">
+                                        <button type="submit" id="smt" class="btn btn-danger btn-block">Añadir</button>
+                                    </div>
                                 </div>
                             </div>
-
-                            <div class="form-group">
-                                <label for="mood" class="col-md-4 control-label">Sensación</label>
-                                <div class="col-md-4">
-                                    <select class="form-control selectpicker" style="display: none;" name="mood" id="mood">
-                                      <?php
-                                      $m = array("fa-heart-o text-info","fa-smile-o text-success","fa-meh-o text-warning","fa-frown-o text-danger","fa-times text-danger");
-                                      foreach ($moods as $key => $value) {
-                                        if(isset($m[$key])){
-                                            $w = " data-icon='fa fa-lg fa-fw ".$m[$key]."'";
-                                        }
-                                        else{
-                                            $w = "";
-                                        }
-                                      ?>
-                                      <option<?php echo $w;?>  value="<?php echo $value["ID"];?>"><?php echo utf8_encode(ucfirst($value["name"]));?></option>
-                                      <?php } ?>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="tags" class="col-md-4 control-label">Etiquetas</label>
-                                <div class="col-md-4">
-                                    <input spellcheck="false" autocomplete="off" autocapitalize="off" type="text" class="col-md-4 form-control" name="tags" id="tags" data-role="tagsinput"></input>
-                                </div>
-                                <div class="col-md-4" id="exampletags"></div>
-                            </div>
-
-                            <div class="col-md-offset-4 col-md-4"><button type="submit" id="smt" class="btn btn-danger btn-block">Añadir</button></div>
                         </fieldset>
 
                     </form>
@@ -237,6 +252,8 @@ $daytotals = getDayTotal();
         <script type="text/javascript">
 
             var curoptions = {};
+            var starttime = 0;
+            var tracking = false;
 
             var instance_searchdatetime = $('.search_datetime').datetimepicker({
                 pickerPosition: 'top-left',
@@ -288,7 +305,7 @@ $daytotals = getDayTotal();
                 max: 300,                       // max value
                 type: 'single',                 // slider type
                 step: 5,                       // slider step
-                postfix: ' minutos',             // postfix text
+                //postfix: ' minutos',             // postfix text
                 hasGrid: false,//true,                  // enable grid
                 hideMinMax: false,               // hide Min and Max fields
                 hideFromTo: false,               // hide From and To fields
@@ -405,6 +422,8 @@ $daytotals = getDayTotal();
             $("#togAdd").on("click", function(){
                 $("#bot").removeClass("visible");
                 $("body").removeClass("padd");
+                $("#finetune").collapse('hide');
+                $("#toggleTrack > p").html("");
             });
 
             function loadStats(options){
@@ -693,6 +712,55 @@ $daytotals = getDayTotal();
                 $("#csholder > .bootstrap-tagsinput > input").val("");
             });
 
+            $("#toggleTrack").on("click", function(){
+                if(tracking==true){
+                    $("#toggleTrack > span").html("Resume tracking");
+                    $("#toggleTrack").removeClass("tracking");
+                    $("#finetune").collapse('show');
+                    tracking = false;
+                }
+                else{
+                    starttime = new Date();
+                    timer = setTimeout(updateTrack, 500);
+                    $("#toggleTrack span").html("Stop tracking");
+                    $("#toggleTrack").addClass("tracking");
+                    $("#finetune").collapse('hide');
+                    tracking = true;
+                }
+            });
+
+            function updateTrack(){
+                var end = new Date();
+                var rng = Math.floor((end - starttime)/1000);
+
+                var text = "";
+
+                var h, m, s;
+                    h = '0' + Math.floor(rng/3600);
+                    m = '0' + Math.floor((rng/60)%60);
+                    s = '0' + Math.floor(rng%60);
+
+                if(h!="00"){
+                    text+=h.substr(-2)+":";
+                }
+                else{
+                    //text+="00:";
+                }
+                if(m!="00"){
+                    text+=m.substr(-2)+":";
+                }
+                else{
+                    text+="00:";
+                }
+                text+=s.substr(-2);
+
+                instance_duration.ionRangeSlider("update", {from:m});
+                $("#toggleTrack > p").html(text);
+                if(tracking==true){
+                    timer = setTimeout(updateTrack, 500);
+                }
+            }
+
             // Attach a submit handler to the form
             $( "#addform" ).submit(function( event ) {
              
@@ -728,6 +796,8 @@ $daytotals = getDayTotal();
                     
               }
 
+              ///$("#toggleTrack > p").html("");
+              //$("#toggleTrack > span").html("Start tracking");
               $("#smt").removeClass("disabled");
             });
 
@@ -765,7 +835,7 @@ $daytotals = getDayTotal();
             function searchduration(value){
                 loadStats({duration:value});
             }
-            
+
             var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
             g.src='//www.google-analytics.com/ga.js';
