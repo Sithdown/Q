@@ -73,6 +73,7 @@ span.hint{
     outline: 0;
     border-width: 1px;
     border-color: #d2322d;
+    margin: auto;
     box-sizing: border-box;
     transition: all 0.3s;
 }

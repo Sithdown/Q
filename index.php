@@ -110,9 +110,9 @@ $daytotals = getDayTotal();
                     </a>
                     <ul class="dropdown-menu" role="menu" aria-labelledby="drop-settings">
                         <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Toggle greedy search</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Resetear estadísticas</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Reset statistics</a></li>
                         <li role="presentation" class="divider"></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">logout</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Logout</a></li>
                     </ul>
                 </li>
             </ul>
@@ -131,14 +131,12 @@ $daytotals = getDayTotal();
                                 <div class="col-md-offset-4 col-md-4">
                                     <button id="toggleTrack" class="btn btn-danger btn-block"><p style="font-size:4em;"></p><span>Start tracking</span></button>
                                     <br>
-                                    <p style="color:white;font-size:2em;text-align:center;">or</p>
-                                    <br>
-                                    <button class="btn btn-danger btn-block" data-toggle="collapse" data-target="#finetune">Fine tune</button>
+                                    <button class="btn btn-link btn-block" style="color:#aaa;" data-toggle="collapse" data-target="#finetune">Fine tune</button>
                                 </div>
                             </div>
                             <div id="finetune" class="collapse">
                                 <div class="form-group time-advanced">
-                                    <label for="datetime" class="col-md-4 control-label">Fecha</label>
+                                    <label for="datetime" class="col-md-4 control-label">Date</label>
                                     <div class="input-group date form_datetime col-md-4" data-date="" data-date-format="dd MM yyyy - HH:ii p" data-link-field="datetime">
                                         <input class="form-control" size="16" type="text" value="" readonly>
                                         <span class="input-group-addon"><i class="fa fa-times"></i></span>
@@ -147,21 +145,21 @@ $daytotals = getDayTotal();
                                     <input type="hidden" id="datetime" name="datetime" value="" /><br/>
                                 </div>
                                 <div class="form-group">
-                                    <label for="duration" class="col-md-4 control-label">Duración</label>
+                                    <label for="duration" class="col-md-4 control-label">Length</label>
                                     <div class="input-grodup col-md-4">
                                         <input name="duration" id="duration" class="form-control" size="16" type="text">
                                     </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="description" class="col-md-4 control-label">Descripción</label>
+                                    <label for="description" class="col-md-4 control-label">Description</label>
                                     <div class="col-md-4">
                                         <textarea class="form-control" rows="3" name="description" id="description"></textarea>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="mood" class="col-md-4 control-label">Sensación</label>
+                                    <label for="mood" class="col-md-4 control-label">Mood</label>
                                     <div class="col-md-4">
                                         <select class="form-control selectpicker" style="display: none;" name="mood" id="mood">
                                           <?php
@@ -181,7 +179,7 @@ $daytotals = getDayTotal();
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="tags" class="col-md-4 control-label">Etiquetas</label>
+                                    <label for="tags" class="col-md-4 control-label">Tags</label>
                                     <div class="col-md-4">
                                         <input spellcheck="false" autocomplete="off" autocapitalize="off" type="text" class="col-md-4 form-control" name="tags" id="tags" data-role="tagsinput"></input>
                                     </div>
@@ -190,7 +188,7 @@ $daytotals = getDayTotal();
 
                                 <div class="form-group">
                                     <div class="col-md-offset-4 col-md-4">
-                                        <button type="submit" id="smt" class="btn btn-danger btn-block">Añadir</button>
+                                        <button type="submit" id="smt" class="btn btn-danger btn-block">Add</button>
                                     </div>
                                 </div>
                             </div>
@@ -219,7 +217,7 @@ $daytotals = getDayTotal();
                                 </div>
 
                                 <div class="form-group col-md-4" id="csholder">
-                                    <input id="combinedsearch" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" class="form-control" placeholder="Búsqueda">
+                                    <input id="combinedsearch" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" class="form-control" placeholder="Search">
                                 </div>
                                 <!--
                                 <div class="form-group col-md-4">
@@ -257,7 +255,7 @@ $daytotals = getDayTotal();
 
             var instance_searchdatetime = $('.search_datetime').datetimepicker({
                 pickerPosition: 'top-left',
-                language:  'es',
+                language:  'en',
                 weekStart: 1,
                 todayBtn:  1,
                 autoclose: 0,
@@ -290,7 +288,7 @@ $daytotals = getDayTotal();
 
             var instance_datetime = $('.form_datetime').datetimepicker({
                 pickerPosition: 'bottom-left',
-                language:  'es',
+                language:  'en',
                 weekStart: 1,
                 todayBtn:  1,
                 autoclose: 1,
@@ -451,7 +449,7 @@ $daytotals = getDayTotal();
 
                 }
 
-                var meses = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+                var meses = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
                 var icoMoods = ["fa-heart-o text-info","fa-smile-o text-success","fa-meh-o text-warning","fa-frown-o text-danger","fa-times text-danger"];
 
                 var moods = [];
@@ -555,21 +553,21 @@ $daytotals = getDayTotal();
                             };
                             bars = "<div style=\'height:300px;\'>"+brs+"</div>";
 
-                            var bread = '<ol class="breadcrumb"><li><a href="#" onclick="loadStats({});">Estadísticas</a></li>';
+                            var bread = '<ol class="breadcrumb"><li><a href="#" onclick="loadStats({});">Stats</a></li>';
 
 
                             $.each( options, function( key, value ) {
                                 var v = value;
                                 if(key=="tags"){
                                     var vv = (v+"").split(",");
-                                    v = 'Etiquetados';
+                                    v = 'Tagged';
                                     $.each(vv, function(ke, val){
                                         v+=' <span class="label label-default">'+val+'</span>';
                                     });
                                 }
                                 if((key=="description")||(key=="terms")){
                                     var vv = (v+"").split(",");
-                                    v = 'Con los términos';
+                                    v = 'With terms';
                                     $.each(vv, function(ke, val){
                                         v+=' <span class="label label-default">'+val+'</span>';
                                     });
@@ -577,10 +575,10 @@ $daytotals = getDayTotal();
                                 if((key=="dategte")||(key=="datelt")){
                                     var vv = (v+"").split(",");
                                     if(key=="dategte"){
-                                        v = 'A partir de';
+                                        v = 'Starting on';
                                     }
                                     else{
-                                        v = 'Anteriores a';
+                                        v = 'Before';
                                     }
                                     $.each(vv, function(ke, val){
                                         val = val.split(" ");
@@ -598,15 +596,15 @@ $daytotals = getDayTotal();
                                 }
                                 if((key=="durationgte")||(key=="durationlt")){
                                     if(key=="durationgte"){
-                                        v = 'De <span class="label label-default">'+pTime(value)+'</span> o más';
+                                        v = 'De <span class="label label-default">'+pTime(value)+'</span> or higher';
                                     }
                                     else{
-                                        v = 'De menos de <span class="label label-default">'+pTime(value)+'</span>';
+                                        v = '<span class="label label-default">'+pTime(value)+'</span> or lower';
                                     }
                                 }
                                 if(key=="mood"){
                                     var vv = (v+"").split(",");
-                                    v = 'Con resultado';
+                                    v = 'With mood';
                                     $.each(vv, function(ke, val){
                                         v+=' <span class="label label-default">'+moods[val-1][0].toUpperCase()+moods[val-1].slice(1)+'</span>';
                                         //v+=' <span class="label label-default">'+val+'</span>';
@@ -625,20 +623,20 @@ $daytotals = getDayTotal();
 
                     } 
                     else{
-                        var bread = '<ol class="breadcrumb"><li><a href="#" onclick="loadStats({});">Estadísticas</a></li>';
+                        var bread = '<ol class="breadcrumb"><li><a href="#" onclick="loadStats({});">Stats</a></li>';
 
                         $.each( options, function( key, value ) {
                             var v = value;
                             if(key=="tags"){
                                 var vv = (v+"").split(",");
-                                v = 'Etiquetados';
+                                v = 'Tagged';
                                 $.each(vv, function(ke, val){
                                     v+=' <span class="label label-default">'+val+'</span>';
                                 });
                             }
                             if((key=="description")||(key=="terms")){
                                 var vv = (v+"").split(",");
-                                v = 'Con los términos';
+                                v = 'With terms';
                                 $.each(vv, function(ke, val){
                                     v+=' <span class="label label-default">'+val+'</span>';
                                 });
@@ -646,10 +644,10 @@ $daytotals = getDayTotal();
                             if((key=="dategte")||(key=="datelt")){
                                 var vv = (v+"").split(",");
                                 if(key=="dategte"){
-                                    v = 'A partir de';
+                                    v = 'Starting on';
                                 }
                                 else{
-                                    v = 'Anteriores a';
+                                    v = 'Before';
                                 }
                                 $.each(vv, function(ke, val){
                                     val = val.split(" ");
@@ -667,15 +665,15 @@ $daytotals = getDayTotal();
                             }
                             if((key=="durationgte")||(key=="durationlt")){
                                 if(key=="durationgte"){
-                                    v = 'De <span class="label label-default">'+pTime(value)+'</span> o más';
+                                    v = '<span class="label label-default">'+pTime(value)+'</span> or higher';
                                 }
                                 else{
-                                    v = 'De menos de <span class="label label-default">'+pTime(value)+'</span>';
+                                    v = '<span class="label label-default">'+pTime(value)+'</span> or lower';
                                 }
                             }
                             if(key=="mood"){
                                 var vv = (v+"").split(",");
-                                v = 'Con resultado';
+                                v = 'With mood';
                                 $.each(vv, function(ke, val){
                                     v+=' <span class="label label-default">'+moods[val-1][0].toUpperCase()+moods[val-1].slice(1)+'</span>';
                                 });
@@ -683,7 +681,7 @@ $daytotals = getDayTotal();
 
                             bread+='<li><a href="#" onclick="loadStats({'+key+':\''+value+'\'});">'+v+'</a></li>';
                         });
-                        $("#stats").html(bread+'</ol><div class="alert alert-default"><h1>No se han encontrado resultados.</h1></div>');
+                        $("#stats").html(bread+'</ol><div class="alert alert-default"><h1>No results found matching the selected criteria.</h1></div>');
 
                     }
 

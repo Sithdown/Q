@@ -276,3 +276,24 @@ function matchCriteria() {
 	}
 	return false;
 }
+
+/*
+
+SELECT logs.ID, logs.datetime, logs.duration, logs.description, logs.mood, tags.tag
+FROM tags
+INNER JOIN log_tags ON tags.ID=log_tags.tag_id
+INNER JOIN logs ON log_tags.tag_id=logs.ID
+WHERE
+	logs.duration < 165
+	AND
+	(
+	logs.description LIKE '%p%'
+	OR
+	tags.tag LIKE '%p%'
+	OR
+	tags.tag LIKE '%c%'
+	)
+GROUP BY
+	logs.ID
+
+*/
