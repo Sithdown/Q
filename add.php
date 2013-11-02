@@ -1,4 +1,4 @@
-<?php //header('Content-type: application/json');
+<?php header('Content-type: application/json');
 
 require_once "connection.php";
 
@@ -9,9 +9,14 @@ function add() {
 	$sql=array();
 	$paramArray=array();
 
-	$posts = $_GET;
+	if(isset($_POST)){
+		$posts = $_POST;
+	}
+	if($posts==null){
+		$posts = $_GET;
+	}
 
-	$insert = "INSERT INTO logs (`ID`,`datetime`,`duration`,`description`,`mood`) VALUES (NULL, :datetime, :duration, :description, :mood)";
+	$insert = "INSERT INTO logs (`ID`,`datetime`,`duration`,`description`,`tags`,`mood`,`weather`) VALUES (NULL, :datetime, :duration, :description, :tags, :mood, :weather)";
 
 	$ready = $pdo->prepare($insert);
 	$result = $ready->execute(prepareData($posts,$insert));
@@ -49,6 +54,7 @@ function prepareData($object,$ins){
 		":datetime" => $object["datetime"],
 		":duration" => $object["duration"],
 		":description" => utf8_decode($object["description"]),
+		":tags" => utf8_decode($object["tags"]),
 		":mood" => $object["mood"],
 	);
 

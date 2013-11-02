@@ -45,6 +45,11 @@ span.hint{
     border-left: 1px solid #444;
 }
 
+#bot .form-group.col-md-1 {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
 #bot .form-group.col-md-4{
     padding-left: 5px;
     padding-right: 5px;
@@ -129,6 +134,26 @@ span.hint{
 
 .navbar-inverse .bootstrap-tagsinput input {
     min-width: 140px;
+}
+
+.navbar-inverse .bootstrap-select.btn-group .btn .filter-option {
+    left: 20px;
+    right: 25px;
+    color: #aaa;
+}
+
+.navbar-inverse .bootstrap-select.btn-group .btn .caret {
+    display: none;
+}
+
+
+.navbar-inverse .bootstrap-select.btn-group .btn {
+    background-color: #333;
+    border: 0px solid #ccc;
+}
+
+.navbar-inverse .bootstrap-select.btn-group .btn:focus {
+    outline: none !important;
 }
 
 .navbar-form {
