@@ -13,8 +13,6 @@ function aQuery($select,$append,$gets=null){
 		$something = false;
 		$a = "";
 
-
-
 		if((isset($gets['dategte']))||(isset($gets['datelte']))){
 			$something = true;
 		}
@@ -63,12 +61,12 @@ function aQuery($select,$append,$gets=null){
 			}
 			elseif($key == "containsurls"){
 				$key = "regexurl";
-				$sql[] = "description REGEXP :".$key;
+				$sql[] = " description REGEXP :".$key;
 				$value = "(https?://|www\\.)[\.A-Za-z0-9\-]+\\.[a-zA-Z]{2,4}";
 			}
 			elseif($key == "containstwitter"){
 				$key = "regextwitter";
-				$sql[] = "description REGEXP :".$key;
+				$sql[] = " description REGEXP :".$key;
 				$value = "[@]+[A-Za-z0-9_]+";
 			}
 			else{
@@ -368,12 +366,12 @@ function matchCriteria() {
 		}
 		elseif($key == "containsurls"){
 			$key = "regexurl";
-			$sql[] = "description REGEXP :".$key;
+			$sql[] = " description REGEXP :".$key;
 			$value = "(https?://|www\\.)[\.A-Za-z0-9\-]+\\.[a-zA-Z]{2,4}";
 		}
 		elseif($key == "containstwitter"){
 			$key = "regextwitter";
-			$sql[] = "description REGEXP :".$key;
+			$sql[] = " description REGEXP :".$key;
 			$value = "[@]+[A-Za-z0-9_]+";
 		}
 		else{

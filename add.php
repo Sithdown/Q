@@ -56,6 +56,7 @@ function prepareData($object,$ins){
 		":description" => utf8_decode($object["description"]),
 		":tags" => utf8_decode($object["tags"]),
 		":mood" => $object["mood"],
+		":weather" => $object["weather"]
 	);
 
 	return $result;

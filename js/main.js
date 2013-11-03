@@ -5,6 +5,7 @@ appoptions.lon = 0;
 appoptions.starttime = 0;
 appoptions.tracking = false;
 appoptions.maxduration = 300;
+appoptions.appid = "1a8418253428a64beb61481ae76af331"; //get yours at http://openweathermap.org/login
 
 var monthsArray = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 var icoMoods = ["fa-heart-o text-info","fa-smile-o text-success","fa-meh-o text-warning","fa-frown-o text-danger","fa-times text-danger"];
@@ -159,6 +160,121 @@ function getLocation(){
 function getCoords(pos){
     appoptions.lat = pos.coords.latitude;
     appoptions.lon = pos.coords.longitude;
+}
+
+/**
+ * Description
+ * @method calcWeather
+ * @param {Object} w
+ * @param {String} datetime
+ * @param {Int} duration
+ * @return 
+ */
+function calcWeather(w,datetime,duration){
+
+    var score = 0;
+
+    var cloudiness = 0;
+    var wind = 0;
+    var weather = 0;
+    var sunrise = 0;
+    var sunset = 0;
+    var temperature = 0;
+    var humidity = 0;
+
+    cloudiness = w["clouds"]["all"]; //percentage
+    wind = w["wind"]["speed"];
+    weather = w["weather"][0]["id"];
+    sunrise = w["sys"]["sunrise"];
+    sunset = w["sys"]["sunset"];
+    temperature = w["main"]["temp"];
+    humidity = w["main"]["humidity"]; //percentage
+
+    //console.log(w);
+
+    var severity = getSeverity(weather);
+
+    // DAYLIGHT SCORE
+    var lightscore = 0;
+
+    var daylighttotaltime = sunset-sunrise;
+    var activitystart = Math.round(new Date(datetime).getTime()/1000); //
+    var activityend = activitystart+duration*60;
+    var activitytime = activityend-activitystart;
+    var optimalstart = sunrise + 1*60*60; // 1h after sunrise
+    var optimalend = sunset - 1*60*60; // 1h before sunset
+
+    var activitybeforeoptimal = optimalstart - activitystart > 0? optimalstart - activitystart : 0;
+    var activityafteroptimal = activityend - optimalend > 0? activityend - optimalend : 0;
+    var activityoptimal = (activitytime - (activitybeforeoptimal + activityafteroptimal))>0?activitytime - (activitybeforeoptimal + activityafteroptimal):0;
+
+    var optimalpercent = activityoptimal/activitytime;
+    var multiplier = (100 - (cloudiness * 0.5 * severity)) / 100;
+    lightscore = (Math.round(optimalpercent * multiplier * 100) / 100);
+
+
+    // TEMPERATURE SCORE
+    var tempscore = 0;
+
+    var tempoptimal = 21;
+    var range = 4;
+    temperature+=-273.15;
+
+    var tempmax = tempoptimal+range;
+    var tempmin = tempoptimal-range;
+
+    if((temperature<tempmax)&&(temperature>tempmin)){
+        if(temperature>tempoptimal){
+            tempscore = (range-(temperature-tempoptimal))/range;
+        }
+        if(temperature<tempoptimal){
+            tempscore = (range-(tempoptimal-temperature))/range;
+        }
+        if(temperature==tempoptimal){
+            tempscore = 1;
+        }
+    }
+
+    // HUMIDITY SCORE
+    var humscore = 0;
+    if((humidity>55)&&(humidity<80)){
+        humscore = 1;
+    }
+
+    score = (lightscore + tempscore + humscore) / 3;
+    /*
+    console.log("lightscore: ", lightscore);
+    console.log("tempscore: ", tempscore);
+    console.log("humscore: ", humscore);
+    console.log("score: ", score);
+    */
+
+    return score;
+}
+
+/**
+ * Description
+ * @method getSeverity
+ * @param {Int} weather
+ * @return 
+ */
+function getSeverity(weather){
+
+    switch((weather+"").substring(0,1))
+    {
+    case 2:
+    case 3:
+    case 5:
+    case 6:
+        return 0.5;
+        break;
+    case 7:
+    case 9:
+        return 1;
+        break;
+    default:
+      return 0.1;
+    }
 }
 
 /**
@@ -348,8 +464,12 @@ function createResultsTable(json,options,args){
 
         });
 
+        //console.log("list.php?daytotals=true"+args);
+
         var daytotals = $.getJSON( "list.php?daytotals=true"+args, { } )
         .done(function( js ) {
+
+            //console.log(js);
 
             var bread = createBreadCrumb(options,moods);
             var bars = createBarGraph(js);
@@ -547,23 +667,23 @@ function loadStatsReal(options){
             }
         });
         if(searchurls==true){
-            args+="&containsurls";
+            args+="&containsurls=true";
         }
         if(searchtwitter==true){
-            args+="&containstwitter";
+            args+="&containstwitter=true";
         }
-        if(args.indexOf("&&")==0){
-            args=args.substring(2);
-        }
-        if(args.indexOf("&")==0){
-            args=args.substring(1);
+        if(args.indexOf("&&")!==-1){
+            args= args.replace("&&","&");
         }
         if(args.indexOf(",&")!==-1){
             args= args.replace(",&","&");
         }
+        if(args.indexOf("=,")!==-1){
+            args= args.replace("=,","=");
+        }
 
     }
-    console.log(args);
+    //console.log(args);
 
     $("#stats").html('<div class="col-md-1 col-md-offset-5" style="text-align:center;padding-top:100px;"><i class="fa fa-refresh fa-5x fa-spin"></i></div>');
 
@@ -718,32 +838,24 @@ $( "#smt" ).on("click", function( event ) {
 
   if((datetime)&&(duration!=0)){
 
-    var cloudiness = 0;
-    var wind = 0;
-    var weather = 0;
-    var sunrise = 0;
-    var sunset = 0;
-    var temperature = 0;
-    var humidity = 0;
+    var query = {};
+    query["datetime"] = datetime;
+    query["duration"] = duration;
+    query["description"] = description;
+    query["mood"] = mood;
+    query["tags"] = tags;
+    query["weather"] = "";
 
-    //?q=Gijon
-    $.getJSON( "http://api.openweathermap.org/data/2.5/weather?callback=?&lat="+appoptions.lat+"&lon="+appoptions.lon)
+    $.getJSON( "http://api.openweathermap.org/data/2.5/weather?callback=?&lat="+appoptions.lat+"&lon="+appoptions.lon+"&appid="+appoptions.appid)
       .done(function(w) {
-        console.log(w);
-        cloudiness = w["clouds"]["all"]; //percentage
-        wind = w["wind"]["speed"];
-        weather = w["weather"][0]["id"];
-        sunrise = w["sys"]["sunrise"];
-        sunset = w["sys"]["sunset"];
-        temperature = w["main"]["temp"];
-        humidity = w["main"]["humidity"]; //percentage
+        query["weather"] = calcWeather(w,datetime,duration);
       })
       .fail(function() {
         console.log( "error" );
       });
 
     // Send the data using post
-    $.post( url, $form.serialize() )
+    $.post( url, query )
 
         .done(function( data ) {
             $("body").addClass("success");
