@@ -73,7 +73,7 @@ span.hint{
 
 #toggleTrack{
     min-width: 220px;
-    width: 360px;
+    //width: 360px;
     height: 164px;
     outline: 0;
     border-width: 1px;

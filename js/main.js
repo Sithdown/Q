@@ -242,14 +242,15 @@ function calcWeather(w,datetime,duration){
     }
 
     score = (lightscore + tempscore + humscore) / 3;
+
     /*
     console.log("lightscore: ", lightscore);
     console.log("tempscore: ", tempscore);
     console.log("humscore: ", humscore);
     console.log("score: ", score);
-    */
+    */  
 
-    return score;
+    return score * 100;
 }
 
 /**
@@ -464,12 +465,8 @@ function createResultsTable(json,options,args){
 
         });
 
-        //console.log("list.php?daytotals=true"+args);
-
         var daytotals = $.getJSON( "list.php?daytotals=true"+args, { } )
         .done(function( js ) {
-
-            //console.log(js);
 
             var bread = createBreadCrumb(options,moods);
             var bars = createBarGraph(js);
@@ -477,6 +474,7 @@ function createResultsTable(json,options,args){
             $("#stats").html(bread+bars+'<div class="table-responsive"><table class="col-md-4 table table-striped" style="text-align:center;padding-top:100px;background-color:#FAFAFA;">'+items.join( "" )+'</tbody></table></div>');
             $('.progress-bar').progressbar();
             $('.progress-bar').tooltip({container:'body',placement:'bottom'});
+            $('td').tooltip({container:'#stats',placement:'bottom'});
         });
 
     } 
@@ -592,14 +590,15 @@ cs.tagsinput({
 });
 
 cs.change(function(){
-    if($(this).val()!=""){
-        loadStats({terms:$(this).val()});
-    }
-    else{
-        reloadStats();
+    if(!appoptions.onhold){
+        if($(this).val()!=""){
+            loadStats({terms:$(this).val()});
+        }
+        else{
+            reloadStats();
+        }
     }
 });
-
 
 /**
  * Description
@@ -607,8 +606,13 @@ cs.change(function(){
  * @return 
  */
 function reloadStats(){
+    appoptions.onhold = true;
+    //$("#combinedsearch").val("");
+    $("#combinedsearch").tagsinput('removeAll');
+    $("#csholder > .bootstrap-tagsinput > input").val("");
     curoptions={};
     loadStatsReal(curoptions);
+    appoptions.onhold = false;
 }
 
 /**
@@ -683,9 +687,8 @@ function loadStatsReal(options){
         }
 
     }
-    //console.log(args);
 
-    $("#stats").html('<div class="col-md-1 col-md-offset-5" style="text-align:center;padding-top:100px;"><i class="fa fa-refresh fa-5x fa-spin"></i></div>');
+    //$("#stats").html('<div class="col-md-1 col-md-offset-5" style="text-align:center;padding-top:100px;"><i class="fa fa-refresh fa-5x fa-spin"></i></div>');
 
     $.getJSON( "list.php?"+args, { } )
       .done(function( json ) {
@@ -795,14 +798,14 @@ $("#togAdd").on("click", function(){
 });
 
 $("#togStats").on("click", function(){
-    curoptions = {};
     reloadStats();
-    $("#combinedsearch").val("");
-    $("#combinedsearch").tagsinput('removeAll');
-    $("#csholder > .bootstrap-tagsinput > input").val("");
 });
 
 $("#toggleTrack").on("click", function(){
+
+  // Stop form from submitting normally
+  event.preventDefault();
+
     if(appoptions.tracking==true){
         $("#toggleTrack > span").html("Resume tracking");
         $("#toggleTrack").removeClass("tracking");
@@ -844,15 +847,18 @@ $( "#smt" ).on("click", function( event ) {
     query["description"] = description;
     query["mood"] = mood;
     query["tags"] = tags;
-    query["weather"] = "";
 
     $.getJSON( "http://api.openweathermap.org/data/2.5/weather?callback=?&lat="+appoptions.lat+"&lon="+appoptions.lon+"&appid="+appoptions.appid)
-      .done(function(w) {
-        query["weather"] = calcWeather(w,datetime,duration);
-      })
-      .fail(function() {
+    .done(function(w) {
+        appoptions.curweather = calcWeather(w,datetime,duration);
+        query["weather"] = appoptions.curweather;
+    })
+    .fail(function() {
         console.log( "error" );
-      });
+        appoptions.curweather = 0;
+    });
+
+    query["weather"] = appoptions.curweather;
 
     // Send the data using post
     $.post( url, query )
@@ -882,16 +888,16 @@ $("#csholder > .bootstrap-tagsinput > input").bind('input keyup', function(){
     $this.data('timer', setTimeout(function(){
 
         $this.removeData('timer');
-        if(($this.val()!="")&&($this.val().length>2)){
-            if(($("#combinedsearch").val()=="")||($("#combinedsearch").val()==$this.val())){
-                loadStats({terms:$this.val()});
+        if(!appoptions.onhold){
+            var t = "";
+            t+=$("#combinedsearch").val();
+            if($this.val().length>2){
+                t+=($("#combinedsearch").val()!="")? "," : "";
+                t+= $this.val();
             }
-            else{
-                loadStats({terms:$("#combinedsearch").val()+","+$this.val()});
+            if(t!=""){
+                loadStats({terms:t});
             }
-        }
-        else{
-            loadStats({terms:$("#combinedsearch").val()});
         }
     }, delay));
 });

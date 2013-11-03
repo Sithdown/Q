@@ -276,9 +276,9 @@ $daytotals = getDayTotal();
         -->
         <script id="template-row" type="text/x-handlebars-template">
             <tr id='log_{{val.id}}'>
-                <td onclick='searchDuration({{val.duration}})' class='col-md-1 clickable' title='{{val.datetime}}'>{{val.cleantime}}</td>
+                <td onclick='searchDuration({{val.duration}})' class='col-md-1 clickable' title='{{val.datetime}}' data-toggle='tooltip'>{{val.cleantime}}</td>
                 <td class='col-md-7'>{{{val.description}}}</td>
-                <td class='col-md-1' title='{{val.cleanmood}}'>{{{icoMood}}}</td>
+                <td class='col-md-1' title='{{val.cleanmood}}' data-toggle='tooltip'>{{{icoMood}}}</td>
                 <td class='col-md-3'>{{{val.t}}}</td>
             </tr>
         </script>
