@@ -7,6 +7,9 @@ echo json_encode(matchCriteria());
 function aQuery($select,$append,$gets=null){
 	global $pdo;
 
+	// apaño
+	//$gets["private"] = 0;
+
 	if($gets!==null){
 		$sql=array();
 		$paramArray=array();
@@ -37,7 +40,10 @@ function aQuery($select,$append,$gets=null){
 		}
 
 		foreach ($gets as $key => $value) {
-			if(($key == "dategte")||($key == "datelte")){
+			if($key == "date"){
+				$sql[] = "date(datetime) = :".$key;
+			}
+			elseif(($key == "dategte")||($key == "datelte")){
 
 				$k = "datetime";
 
@@ -118,6 +124,9 @@ function aQuery($select,$append,$gets=null){
 		$insert = str_replace("AND OR", "AND", $insert);
 		$insert = str_replace("WHERE GROUP", "GROUP", $insert);
 		$insert = str_replace("AND GROUP", "GROUP", $insert);
+		$insert = str_replace("ANDm", "AND m", $insert);
+		$insert = str_replace("  ", " ", $insert);
+		$insert = str_replace("ANDd", "AND d", $insert);
 
 		
 		$ready = $pdo->prepare($insert);
@@ -212,7 +221,7 @@ function getActivityByMonthDay($gets=null){
 
 	global $pdo;
 
-	$select = 'SELECT MONTHDAY(datetime) AS monthday, SUM(duration) AS duration_total FROM logs';
+	$select = 'SELECT MONTHDAY(datetime) AS monthday, SUM(duration) AS duration_total, TIME(datetime) AS time FROM logs';
 	$append ='GROUP BY MONTHDAY(datetime)';
 
 	$result = aQuery($select,$append,$gets);
@@ -223,7 +232,7 @@ function getActivityByMonth($gets=null){
 
 	global $pdo;
 
-	$select = 'SELECT MONTH(datetime) AS month, SUM(duration) AS duration_total FROM logs';
+	$select = 'SELECT MONTH(datetime) AS month, SUM(duration) AS duration_total, TIME(datetime) AS time FROM logs';
 	$append ='GROUP BY MONTH(datetime)';
 
 	$result = aQuery($select,$append,$gets);
@@ -232,7 +241,7 @@ function getActivityByMonth($gets=null){
 
 function getMonthTotals($gets=null){
 
-	$select = 'SELECT DAY(datetime) AS monthday, DATE(datetime) as date, SUM(duration) AS duration_total FROM logs WHERE YEAR(datetime) = YEAR(CURDATE()) AND MONTH(datetime) = MONTH(CURDATE())';
+	$select = 'SELECT DAY(datetime) AS monthday, DATE(datetime) as date, SUM(duration) AS duration_total, TIME(datetime) AS time FROM logs WHERE YEAR(datetime) = YEAR(CURDATE()) AND MONTH(datetime) = MONTH(CURDATE()) ';
 	$append = 'GROUP BY YEAR(datetime), MONTH(datetime), DAY(datetime)';
 
 	$result = aQuery($select,$append,$gets);
@@ -286,6 +295,9 @@ function matchCriteria() {
 	$a = "";
 
 	$gets = $_GET;
+
+	// apaño
+	//$gets["private"] = 0;
 
 	if(isset($gets['getalltags'])){
 		unset($gets['getalltags']);
@@ -341,7 +353,10 @@ function matchCriteria() {
 	}
 
 	foreach ($gets as $key => $value) {
-		if(($key == "dategte")||($key == "datelte")){
+		if($key == "date"){
+			$sql[] = "date(datetime) = :".$key;
+		}
+		elseif(($key == "dategte")||($key == "datelte")){
 
 			$k = "datetime";
 

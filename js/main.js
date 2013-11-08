@@ -88,10 +88,12 @@ function pText(str) {
      * @param {String} text
      * @return CallExpression
      */
-    var create_link = function (url, text) {
+    var create_link = function (url, text,title) {
         var link = $("<a>", {
             text: text,
+            title: title,
             href: url,
+            onmouseover: 'showThumbnail(this)',
             target: "_blank"
         });
  
@@ -105,7 +107,7 @@ function pText(str) {
  
     // parse username
     str = str.replace(/[@]+[A-Za-z0-9_]+/g, function (s) {
-        return create_link("http://twitter.com/" + s.replace('@', ''), s);
+        return create_link("http://twitter.com/" + s.replace('@', '',true), s, s);
     });
  
     // parse hashtags
@@ -280,6 +282,28 @@ function getSeverity(weather){
 
 /**
  * Description
+ * @method showThumbnail
+ * @param {Object} e
+ * @return 
+ */
+function showThumbnail(e){
+    var c = '<img src="http://free.pagepeeker.com/v2/thumbs.php?size=m&url='+$( e ).attr('href')+'">';
+    if(($(e).attr('title')!="")&&($(e).attr('title')!=undefined)){
+        c = '<img style="margin:auto;text-align:center;width:100%" src="http://twitter.com/api/users/profile_image?screen_name='+$(e).attr('title')+'&size=bigger">';
+    }
+    $( e ).popover({
+        container: '#stats',
+        html: true,
+        title: '',
+        trigger: 'hover',
+        content: c
+    });
+    $( e ).popover('show');
+}
+
+
+/**
+ * Description
  * @method createBreadCrumb
  * @param {Object} options
  * @param {Object} moods
@@ -353,6 +377,43 @@ function createBreadCrumb(options,moods){
     return bread;
 }
 
+function createBarInsight(js){
+    /*
+        <div style="clear:both;height: 300px;background-color: white;margin-bottom: 20px;"><div class="progress" style="
+        height: 48px;
+    ">
+          <div class="progress-bar progress-bar-danger" style="width: 35%">
+            <span class="sr-only">35% Complete (success)</span>
+          </div>
+          <div class="progress-bar progress-bar-danger" style="width: 20%">
+            <span class="sr-only">20% Complete (warning)</span>
+          </div>
+          <div class="progress-bar progress-bar-danger" style="width: 10%">
+            <span class="sr-only">10% Complete (danger)</span>
+          </div>
+      </div>
+      <div style="width:35%;float: left;padding: 10px;overflow-wrap: break-word;"></div>
+      <div style="width:20%;float: left;padding: 10px;overflow-wrap: break-word;"></div>
+      <div style="width:10%;float: left;padding: 10px;overflow-wrap: break-word;overflow: auto;"></div>
+
+    </div>
+    */
+
+    var brs = "<div class='progress' style='height: 48px;'>";
+    var brt = "";
+    var j = 0;
+
+    $.each(js,function(key,val){
+       brs+='<div class="progress-bar progress-bar-danger" style="width: '+parseInt(val["duration_total"])/(16*60/100)+'%"></div>';
+       console.log(val);
+    });
+
+    t = brs+"</div>"+brt;
+
+
+    return "<div style='clear:both;height:300px;background-color:white;margin-bottom:20px;'>"+t+"</div>";
+}
+
 /**
  * Description
  * @method createBarGraph
@@ -369,7 +430,7 @@ function createBarGraph(js){
         if(js[j]!==undefined){
             if((js[j]["monthday"]-1)==i){
 
-                brs+= temp_pbar_v({title:pTime(js[j]['duration_total']),percent:(js[j]['duration_total']/(1440-480)*100)});
+                brs+= temp_pbar_v({title:pTime(js[j]['duration_total']),day:js[j]["date"],percent:(js[j]['duration_total']/(1440-480)*100)});
 
                 j+=1;
             }
@@ -381,7 +442,7 @@ function createBarGraph(js){
             brs+= temp_pbar_v({title:'',percent:0});
         }
     };
-    return "<div style=\'height:300px;\'>"+brs+"</div>";
+    return "<div class='barholder'>"+brs+"</div>";
 
 }
 
@@ -465,11 +526,17 @@ function createResultsTable(json,options,args){
 
         });
 
+
         var daytotals = $.getJSON( "list.php?daytotals=true"+args, { } )
         .done(function( js ) {
 
             var bread = createBreadCrumb(options,moods);
-            var bars = createBarGraph(js);
+            if(args.indexOf("date=")!==-1){
+                var bars = createBarInsight(js);
+            }
+            else{
+                var bars = createBarGraph(js);
+            }
 
             $("#stats").html(bread+bars+'<div class="table-responsive"><table class="col-md-4 table table-striped" style="text-align:center;padding-top:100px;background-color:#FAFAFA;">'+items.join( "" )+'</tbody></table></div>');
             $('.progress-bar').progressbar();
@@ -621,7 +688,7 @@ function reloadStats(){
  * @param {} options
  * @return 
  */
-function loadStats(options,add){
+function loadStats(options){
 
     if($.isEmptyObject(options)){
         loadStatsReal({});
@@ -698,6 +765,8 @@ function loadStatsReal(options){
         $("#bot").addClass("visible");
         $("body").addClass("padd");
 
+        $(".tooltip").remove();
+
         $('.progress-bar').progressbar();
 
         $("#csholder > .bootstrap-tagsinput > input").focus();
@@ -741,7 +810,9 @@ function updateTrack(){
     }
     text+=s.substr(-2);
 
-    appoptions.instance_duration.ionRangeSlider("update", {from:m});
+    var mm = parseInt(h)*60+parseInt(m);
+
+    appoptions.instance_duration.ionRangeSlider("update", {from:mm});
     $("#toggleTrack > p").html(text);
     if(appoptions.tracking==true){
         timer = setTimeout(updateTrack, 500);
@@ -781,7 +852,9 @@ function searchDuration(value){
     loadStats({duration:value});
 }
 
-
+function searchDay(value){
+    loadStats({date:value});
+}
 
 
 /* -----------------------------------------------------------------------------------------------------
@@ -849,14 +922,16 @@ $( "#smt" ).on("click", function( event ) {
     query["tags"] = tags;
 
     $.getJSON( "http://api.openweathermap.org/data/2.5/weather?callback=?&lat="+appoptions.lat+"&lon="+appoptions.lon+"&appid="+appoptions.appid)
-    .done(function(w) {
-        appoptions.curweather = calcWeather(w,datetime,duration);
-        query["weather"] = appoptions.curweather;
-    })
-    .fail(function() {
-        console.log( "error" );
-        appoptions.curweather = 0;
-    });
+
+        .done(function(w) {
+            appoptions.curweather = calcWeather(w,datetime,duration);
+            query["weather"] = appoptions.curweather;
+        })
+
+        .fail(function() {
+            console.log( "error" );
+            appoptions.curweather = 0;
+        });
 
     query["weather"] = appoptions.curweather;
 
@@ -879,6 +954,10 @@ $( "#smt" ).on("click", function( event ) {
   $("#smt").removeClass("disabled");
 
 });
+
+$("#searchmood").change(function(){
+    loadStats({mood:$("#searchmood").val()});
+})
 
 $("#csholder > .bootstrap-tagsinput > input").bind('input keyup', function(){
     var $this = $(this);

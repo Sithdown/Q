@@ -290,7 +290,7 @@ $daytotals = getDayTotal();
         </script>
 
         <script id="template-pbar-v" type="text/x-handlebars-template">
-            <div class='progress vertical bottom'><div title='{{title}}' data-toggle='tooltip' class='progress-bar progress-bar-danger' aria-valuetransitiongoal='{{percent}}'></div></div>
+            <div class='progress vertical bottom'><div title='{{title}}' onclick="searchDay('{{day}}')" data-toggle='tooltip' class='progress-bar progress-bar-danger' aria-valuetransitiongoal='{{percent}}'></div></div>
         </script>
 
         <script id="template-thead" type="text/x-handlebars-template">
