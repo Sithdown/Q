@@ -4,14 +4,15 @@ require_once "connection.php";
 
 $uname = "";
 $showprivate = false;
-$userid=1;
+$userid=0;
 session_start();
+
 if(isset($_SESSION['userid'])){
     $userid = $_SESSION['userid'];
     $username = $_SESSION['username'];
     $uname = " - ".$username;
+    $showprivate = true;
 }
-
 
 function getData($data){
 
@@ -117,7 +118,8 @@ $daytotals = getDayTotal();
           <!-- Collect the nav links, forms, and other content for toggling -->
           <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav">
-              <li class="active"><a href="#stats" data-toggle="tab" id="togStats"><i class="fa fa-bar-chart-o"></i></a></li>
+              <li class="active"><a href="#add" data-toggle="tab" id="togAdd"><i class="fa fa-plus"></i></a></li>
+              <li><a href="#stats" data-toggle="tab" id="togStats"><i class="fa fa-bar-chart-o"></i></a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
 
@@ -126,19 +128,97 @@ $daytotals = getDayTotal();
                         <i class="fa fa-cog fa-lg"></i>
                     </a>
                     <ul class="dropdown-menu" role="menu" aria-labelledby="drop-settings">
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="oauth/twitter">Login</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Toggle greedy search</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Reset statistics</a></li>
+                        <li role="presentation" class="divider"></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="oauth/logout.php">Logout</a></li>
                     </ul>
                 </li>
             </ul>
           </div><!-- /.navbar-collapse -->
         </nav>
 
-
+<?php if(isset($_SESSION['userid'])){ ?>
         <div class="container">
 
             <div class="tab-content">
 
-                <div class="tab-pane active" id="stats">
+                <div class="tab-pane active" id="add">
+
+                    <form id="addform" action="add.php" class="form-horizontal"  role="form">
+                        <fieldset>
+                            <div class="form-group time-basic">
+                                <div class="col-md-offset-4 col-md-4">
+                                    <button id="toggleTrack" class="btn btn-danger btn-block"><p style="font-size:4em;"></p><span>Start tracking</span></button>
+                                    <br>
+                                    <a class="btn btn-link btn-block" style="color:#aaa;" data-toggle="collapse" data-target="#finetune">Fine tune</a>
+                                </div>
+                            </div>
+                            <div id="finetune" class="collapse">
+                                <div class="form-group time-advanced">
+                                    <label for="datetime" class="col-md-4 control-label">Date</label>
+                                    <div class="input-group date form_datetime col-md-4" data-date="" data-date-format="dd MM yyyy - HH:ii p" data-link-field="datetime">
+                                        <input class="form-control" size="16" type="text" value="" readonly>
+                                        <span class="input-group-addon"><i class="fa fa-times"></i></span>
+                                        <span class="input-group-addon"><i class="fa fa-th fa-calendar"></i></span>
+                                    </div>
+                                    <input type="hidden" id="datetime" name="datetime" value="" /><br/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="duration" class="col-md-4 control-label">Length</label>
+                                    <div class="input-grodup col-md-4">
+                                        <input name="duration" id="duration" class="form-control" size="16" type="text">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="description" class="col-md-4 control-label">Description</label>
+                                    <div class="col-md-4">
+                                        <textarea class="form-control" rows="3" name="description" id="description"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="mood" class="col-md-4 control-label">Mood</label>
+                                    <div class="col-md-4">
+                                        <select class="form-control selectpicker" style="display: none;" name="mood" id="mood">
+                                          <?php
+                                          $m = array("fa-heart-o text-info","fa-smile-o text-success","fa-meh-o text-warning","fa-frown-o text-danger","fa-times text-danger");
+                                          foreach ($moods as $key => $value) {
+                                            if(isset($m[$key])){
+                                                $w = " data-icon='fa fa-lg fa-fw ".$m[$key]."'";
+                                            }
+                                            else{
+                                                $w = "";
+                                            }
+                                          ?>
+                                          <option<?php echo $w;?>  value="<?php echo $value["ID"];?>"><?php echo utf8_encode(ucfirst($value["name"]));?></option>
+                                          <?php } ?>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="tags" class="col-md-4 control-label">Tags</label>
+                                    <div class="col-md-4">
+                                        <input spellcheck="false" autocomplete="off" autocapitalize="off" type="text" class="col-md-4 form-control" name="tags" id="tags" data-role="tagsinput"></input>
+                                    </div>
+                                    <div class="col-md-4" id="exampletags"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-offset-4 col-md-4">
+                                        <button type="submit" id="smt" data-loading-text="Sending..." class="btn btn-danger btn-block">Add</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                    </form>
+
+                </div>
+
+                <div class="tab-pane" id="stats">
 
                 </div>
 
@@ -180,8 +260,8 @@ $daytotals = getDayTotal();
                         </div>
                     </nav>
                 </div>
-            </div>
 
+            </div>
 
         </div>
 
@@ -194,8 +274,8 @@ $daytotals = getDayTotal();
         <script src="js/bootstrap-progressbar.min.js" charset="UTF-8"></script>
         <script src="js/bootstrap-select.min.js" charset="UTF-8"></script>
         <script src="js/bootstrap-tagsinput.min.js" charset="UTF-8"></script>
-        <!--<script src="js/typeahead.min.js" charset="UTF-8"></script>
-        <script src="js/ion.rangeSlider.min.js" charset="UTF-8"></script>-->
+        <script src="js/typeahead.min.js" charset="UTF-8"></script>
+        <script src="js/ion.rangeSlider.min.js" charset="UTF-8"></script>
         <script src="js/handlebars.js" charset="UTF-8"></script>
         <script src="js/chart.min.js" charset="UTF-8"></script>
 
@@ -205,9 +285,9 @@ $daytotals = getDayTotal();
             foreach ($moods as $key => $value) {
                 echo "moods[".$key."] = '".utf8_encode($value["name"])."';\n";
             }
-        ?>
-        var userid = "<?php global $userid; echo $userid; ?>";
-        var priv = "<?php global $showprivate; echo $showprivate; ?>";
+            ?>
+            var userid = "<?php echo $userid; ?>";
+            var priv = "<?php echo $showprivate; ?>";
         </script>
 
         <!--
@@ -220,9 +300,9 @@ $daytotals = getDayTotal();
         <script id="template-row" type="text/x-handlebars-template">
             <tr id='log_{{val.id}}'>
                 <td onclick='searchDuration({{val.duration}})' class='col-md-1 clickable' title='{{val.datetime}}' data-toggle='tooltip'>{{val.cleantime}}</td>
-                <!--<td class='col-md-7'>{{{val.description}}}</td>-->
-                <td class='col-md-10'>{{{val.t}}}</td>
+                <td class='col-md-7'>{{{val.description}}}</td>
                 <td class='col-md-1' title='{{val.cleanmood}}' data-toggle='tooltip'>{{{icoMood}}}</td>
+                <td class='col-md-3'>{{{val.t}}}</td>
             </tr>
         </script>
 
@@ -248,7 +328,26 @@ $daytotals = getDayTotal();
         <tbody>
         </script>
 
-        <script src="js/main.js"></script>
+        <script src="js/mainbackend.js"></script>
+
+<?php }else{ ?>
+            <div class="tab-content">
+
+                <div class="tab-pane active" id="add">
+
+                    <form id="addform" action="oauth/twitter" class="form-horizontal"  role="form">
+                        <fieldset>
+                            <div class="form-group time-basic">
+                                <div class="col-md-offset-4 col-md-4">
+                                    <button id="toggleTrack" class="btn btn-danger btn-block"><p style="font-size:4em;"></p><span>Login</span></button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+
+<?php } ?>
 
     </body>
 </html>

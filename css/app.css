@@ -1,7 +1,21 @@
-body { padding-top: 70px; background-color:#666;color: #666;font-family: Helvetica,Arial,sans-serif;}
+body { padding-top: 70px; background-color:#666;color: #666;font-family: Helvetica,Arial,sans-serif;transition:all 1.0s;}
 .progress.vertical{margin-right: 0px;width:3.22580645161%;border-radius:0;}
 .padd{padding-bottom: 70px;}
 .table tbody>tr>td{vertical-align:middle;}
+
+.fail{
+    background-color: #d2322d;
+    transition:all 1.0s;
+}
+
+.sent{
+    background-color: #101010;
+    transition:all 0.5s;
+}
+
+.btn:active, .btn:focus {
+    outline: 0;
+}
 
 #add{
     margin-top: 10vh;
@@ -75,6 +89,9 @@ span.hint{
     }
     .barholder{
         height: 150px;
+    }
+    #add{
+        margin-top: 0;
     }
 }
 
@@ -321,6 +338,10 @@ textarea.form-control {
     font-size: 20px;
     border-radius: 0px;
     line-height: 1.33;
+}
+
+.twitter-typeahead input{
+    min-width: 80px;
 }
 
 .tt-dropdown-menu {

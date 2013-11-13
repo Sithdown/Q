@@ -529,9 +529,8 @@ function createResultsTable(json,options,args){
             var ag = "list.php?"+args;
         }
         else{
-            var ag = "list.php?daytotals=true&"+args;  
+            var ag = "list.php?daytotals=true"+args;  
         }
-
         var daytotals = $.getJSON( ag, { } )
         .done(function( js ) {
 
@@ -548,7 +547,7 @@ function createResultsTable(json,options,args){
             $('.progress-bar').tooltip({container:'body',placement:'bottom'});
             $('td').tooltip({container:'#stats',placement:'bottom'});
 
-            if(args.indexOf("date=")!=-11){
+            if(args.indexOf("date=")!=-1){
                 //Get context with jQuery - using jQuery's .get() method.
                 var ctx = $("#myChart").get(0).getContext("2d");
                 //This will get the first returned node in the jQuery collection.
@@ -556,6 +555,7 @@ function createResultsTable(json,options,args){
                 $.each(js,function(key,val){
                     k.push({value: parseInt(val["duration"]),color:"rgba(210, 50, 45,"+parseInt(val["duration"])/300+")"});
                 })
+                console.log(k);
                 var myNewChart = new Chart(ctx).Doughnut(k,{});
             }
         });
@@ -622,7 +622,49 @@ appoptions.instance_datetime = $('.form_datetime').datetimepicker({
     showMeridian: 0
 });
 
+appoptions.instance_duration = $("#duration").ionRangeSlider({
+    min: 0,                        // min value
+    max: appoptions.maxduration,   // max value
+    type: 'single',                // slider type
+    step: 1,                       // slider step
+    //postfix: ' minutos',         // postfix text
+    hasGrid: false,//true,         // enable grid
+    hideMinMax: false,             // hide Min and Max fields
+    hideFromTo: false,             // hide From and To fields
+    prettify: true,                // separate large numbers with space, eg. 10 000
+    /**
+     * Description
+     * @method onChange
+     * @param {} obj
+     * @return 
+     */
+    onChange: function(obj){        // function-callback, is called on every change
+    },
+    /**
+     * Description
+     * @method onFinish
+     * @param {} obj
+     * @return 
+     */
+    onFinish: function(obj){        // function-callback, is called once, after slider finished it's work
+    }
+});
+
 $('.selectpicker').selectpicker({width:"100%"});
+
+var tg = $('#tags');
+tg.tagsinput({
+    confirmKeys: [13, 44, 188],
+    freeinput: true
+});
+
+tg.tagsinput('input').typeahead(
+    {
+    prefetch: 'list.php?getalltags'
+}).bind('typeahead:selected', $.proxy(function (obj, datum) {  
+    this.tagsinput('add', datum.value);
+    this.tagsinput('input').typeahead('setQuery', '');
+}, tg));
 
 var cs = $('#combinedsearch');
 cs.tagsinput({
@@ -756,13 +798,51 @@ function loadStatsReal(options){
 
       })
       .fail(function( jqxhr, textStatus, error ) {
+        console.log(textStatus);
         var err = textStatus + ", " + error;
         console.log( "Request Failed: " + err );
     });
     
 }
 
+/**
+ * Description
+ * @method updateTrack
+ * @return 
+ */
+function updateTrack(){
+    var end = new Date();
+    var rng = Math.floor((end - appoptions.starttime)/1000);
 
+    var text = "";
+
+    var h, m, s;
+        h = '0' + Math.floor(rng/3600);
+        m = '0' + Math.floor((rng/60)%60);
+        s = '0' + Math.floor(rng%60);
+
+    if(h!="00"){
+        text+=h.substr(-2)+":";
+    }
+    else{
+        //text+="00:";
+    }
+    if(m!="00"){
+        text+=m.substr(-2)+":";
+    }
+    else{
+        text+="00:";
+    }
+    text+=s.substr(-2);
+
+    var mm = parseInt(h)*60+parseInt(m);
+
+    appoptions.instance_duration.ionRangeSlider("update", {from:mm});
+    $("#toggleTrack > p").html(text);
+    if(appoptions.tracking==true){
+        timer = setTimeout(updateTrack, 500);
+    }
+}
 
 
 
@@ -808,6 +888,13 @@ function searchDay(value){
 
 // ---------------------------------------------------------------------------------------------------*/
 
+$("#togAdd").on("click", function(){
+    $("#bot").removeClass("visible");
+    $("body").removeClass("padd");
+    $("#finetune").collapse('hide');
+    $("#toggleTrack > p").html("");
+});
+
 $("#togStats").on("click", function(){
     reloadStats();
 });
@@ -832,6 +919,97 @@ $("#toggleTrack").on("click", function(){
         $("#finetune").collapse('hide');
         appoptions.tracking = true;
     }
+});
+
+
+$( "#smt" ).on("click", function( event ) {
+ 
+    // Stop form from submitting normally
+    event.preventDefault();
+              
+    var $form = $("#addform"),
+    datetime = $form.find( "input[name='datetime']" ).val(),
+    duration = $form.find( "input[name='duration']" ).val(),
+
+    description = $form.find( "textarea[name='description']" ).val(),
+    mood = $form.find( "select[name='mood']" ).val(),
+    tags = $form.find( "input[name='tags']" ).val(),
+    url = $form.attr( "action" );
+
+    if((datetime)&&(duration!=0)&&(description!="")){
+
+        $("#smt").attr('disabled', 'disabled');
+        $("#smt").text("Sending...");
+
+        function nope(){
+            $('body').addClass('fail').delay(500).queue(function(next){
+                $(this).removeClass('fail');
+                next();
+            });
+        }
+
+        var query = {};
+        query["datetime"] = datetime;
+        query["duration"] = duration;
+        query["description"] = description;
+        query["mood"] = mood;
+        query["tags"] = tags;
+
+        $.getJSON( "http://api.openweathermap.org/data/2.5/weather?callback=?&lat="+appoptions.lat+"&lon="+appoptions.lon+"&appid="+appoptions.appid)
+
+        .done(function(w) {
+            appoptions.curweather = calcWeather(w,datetime,duration);
+            query["weather"] = appoptions.curweather;
+
+            // Send the data using post
+            $.post( url, query )
+
+            .done(function( data ) {
+                $("body").addClass("success");
+                appoptions.instance_datetime.datetimepicker('update', new Date());
+                appoptions.instance_duration.ionRangeSlider("update", {from:0});
+
+                $("#toggleTrack > p").html("");
+                $("#toggleTrack > span").html("Start tracking");
+                $("#toggleTrack").removeClass("tracking");
+                appoptions.tracking = false;
+
+                $form.find( "textarea[name='description']" ).val("");
+                $form.find( "select[name='mood']" ).selectpicker('val','1');
+                $form.find( "input[name='tags']" ).val("");
+                $('#tags').tagsinput('removeAll');
+
+                $('body').addClass('sent').delay(500).queue(function(next){
+                     $(this).removeClass('sent');
+                     next();
+                });
+
+            })
+
+            .fail(function(){
+                nope();
+            });                             
+        })
+
+        .fail(function() {
+            console.log( "error getting weather data" );
+            appoptions.curweather = 0;
+
+            nope();
+        });
+
+
+        
+    }
+    else{
+
+        nope();
+
+    }
+
+    $("#smt").removeAttr('disabled');
+    $("#smt").text("Add");
+
 });
 
 $("#searchmood").change(function(){
@@ -861,5 +1039,6 @@ $("#csholder > .bootstrap-tagsinput > input").bind('input keyup', function(){
 });
 
 $( window ).load(function(){
-    reloadStats();
+    getLocation();
+    $("#smt").button();
 });

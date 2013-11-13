@@ -1,14 +1,24 @@
 <?php header('Content-type: application/json');
 
+session_start();
+$showprivate = false;
+$userid=0;
+if(isset($_SESSION['userid'])){
+    $userid = $_SESSION['userid'];
+    $username = $_SESSION['username'];
+    $uname = " - ".$username;
+    $showprivate = true;
+}
+
 require_once "connection.php";
 
 echo json_encode(matchCriteria());
 
 function aQuery($select,$append,$gets=null){
-	global $pdo;
+	global $pdo,$showprivate,$userid;
 
 	// apaño
-	//$gets["private"] = 0;
+	$gets['private'] = 0;
 
 	if($gets!==null){
 		$sql=array();
@@ -40,7 +50,22 @@ function aQuery($select,$append,$gets=null){
 		}
 
 		foreach ($gets as $key => $value) {
-			if($key == "date"){
+
+			if($key == "private"){
+				// apaño
+				if($showprivate){
+					$k = "private";
+					$sql[] = $k." <= :".$key;
+					$value = 5;
+				}
+				else{
+					$k = "private";
+					$sql[] = $k." < :".$key;
+					$value = 1;
+				}
+			}
+
+			elseif($key == "date"){
 				$sql[] = "date(datetime) = :".$key;
 			}
 			elseif(($key == "dategte")||($key == "datelte")){
@@ -127,6 +152,8 @@ function aQuery($select,$append,$gets=null){
 		$insert = str_replace("ANDm", "AND m", $insert);
 		$insert = str_replace("  ", " ", $insert);
 		$insert = str_replace("ANDd", "AND d", $insert);
+		$insert = str_replace("ANDp", "AND p", $insert);
+		$insert = str_replace("ANDu", "AND u", $insert);
 
 		
 		$ready = $pdo->prepare($insert);
@@ -288,7 +315,7 @@ function stringSearch($field="", $array=array(), $p=array(),$startand=false){
 }
 
 function matchCriteria() {
-	global $pdo;
+	global $pdo, $showprivate;
 	$sql=array();
 	$paramArray=array();
 	$something = false;
@@ -296,8 +323,7 @@ function matchCriteria() {
 
 	$gets = $_GET;
 
-	// apaño
-	//$gets["private"] = 0;
+	$gets['private'] = 0;
 
 	if(isset($gets['getalltags'])){
 		unset($gets['getalltags']);
@@ -353,7 +379,22 @@ function matchCriteria() {
 	}
 
 	foreach ($gets as $key => $value) {
-		if($key == "date"){
+
+		if($key == "private"){
+			// apaño
+			if($showprivate){
+				$k = "private";
+				$sql[] = $k." <= :".$key;
+				$value = 5;
+			}
+			else{
+				$k = "private";
+				$sql[] = $k." < :".$key;
+				$value = 1;
+			}
+		}
+
+		elseif($key == "date"){
 			$sql[] = "date(datetime) = :".$key;
 		}
 		elseif(($key == "dategte")||($key == "datelte")){
