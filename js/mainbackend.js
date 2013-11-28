@@ -429,7 +429,15 @@ function createBarGraph(js){
         if(js[j]!==undefined){
             if((js[j]["monthday"]-1)==i){
 
-                brs+= temp_pbar_v({title:pTime(js[j]['duration_total']),day:js[j]["date"],percent:(js[j]['duration_total']/(1440-480)*100)});
+                var c = "";
+                if(js[j]["monthday"]%5==0){
+                    c+="number";
+                }
+                if(js[j]["monthday"]>9){
+                    c+=" double";
+                }
+
+                brs+= temp_pbar_v({c:c,monthday:js[j]['monthday'],title:pTime(js[j]['duration_total']),day:js[j]["date"],percent:(js[j]['duration_total']/(1440-480)*100)});
 
                 j+=1;
             }
@@ -555,7 +563,6 @@ function createResultsTable(json,options,args){
                 $.each(js,function(key,val){
                     k.push({value: parseInt(val["duration"]),color:"rgba(210, 50, 45,"+parseInt(val["duration"])/300+")"});
                 })
-                console.log(k);
                 var myNewChart = new Chart(ctx).Doughnut(k,{});
             }
         });
@@ -777,12 +784,8 @@ function loadStatsReal(options){
 
     //$("#stats").html('<div class="col-md-1 col-md-offset-5" style="text-align:center;padding-top:100px;"><i class="fa fa-refresh fa-5x fa-spin"></i></div>');
 
-    console.log("list.php?"+args);
-
     $.getJSON( "list.php?"+args, { } )
       .done(function( json ) {
-
-        console.log(json);
 
         createResultsTable(json,options,args);
 
@@ -798,7 +801,6 @@ function loadStatsReal(options){
 
       })
       .fail(function( jqxhr, textStatus, error ) {
-        console.log(textStatus);
         var err = textStatus + ", " + error;
         console.log( "Request Failed: " + err );
     });
@@ -934,6 +936,9 @@ $( "#smt" ).on("click", function( event ) {
     description = $form.find( "textarea[name='description']" ).val(),
     mood = $form.find( "select[name='mood']" ).val(),
     tags = $form.find( "input[name='tags']" ).val(),
+
+    priv = $form.find("input[name='priv']:radio:checked").val(),
+
     url = $form.attr( "action" );
 
     if((datetime)&&(duration!=0)&&(description!="")){
@@ -948,19 +953,7 @@ $( "#smt" ).on("click", function( event ) {
             });
         }
 
-        var query = {};
-        query["datetime"] = datetime;
-        query["duration"] = duration;
-        query["description"] = description;
-        query["mood"] = mood;
-        query["tags"] = tags;
-
-        $.getJSON( "http://api.openweathermap.org/data/2.5/weather?callback=?&lat="+appoptions.lat+"&lon="+appoptions.lon+"&appid="+appoptions.appid)
-
-        .done(function(w) {
-            appoptions.curweather = calcWeather(w,datetime,duration);
-            query["weather"] = appoptions.curweather;
-
+        function allfine(){
             // Send the data using post
             $.post( url, query )
 
@@ -988,14 +981,39 @@ $( "#smt" ).on("click", function( event ) {
 
             .fail(function(){
                 nope();
-            });                             
+            });
+        }
+
+        var query = {};
+        query["datetime"] = datetime;
+        query["duration"] = duration;
+        query["description"] = description;
+        query["mood"] = mood;
+        query["tags"] = tags;
+        query["userid"] = userid;
+
+        if(priv=="private"){
+            query["private"] = true;
+        }
+        else{
+            query["private"] = false;
+        }
+
+        $.getJSON( "http://api.openweathermap.org/data/2.5/weather?callback=?&lat="+appoptions.lat+"&lon="+appoptions.lon+"&appid="+appoptions.appid)
+
+        .done(function(w) {
+            appoptions.curweather = calcWeather(w,datetime,duration);
+            query["weather"] = appoptions.curweather;
+
+            allfine();                             
         })
 
         .fail(function() {
             console.log( "error getting weather data" );
             appoptions.curweather = 0;
+            query["weather"] = appoptions.curweather;
 
-            nope();
+            allfine();     
         });
 
 

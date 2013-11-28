@@ -70,15 +70,15 @@ $daytotals = getDayTotal();
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <title>Qapp<?php echo $uname;?></title>
-        <meta name="description" content="Qapp is an bla bla bla bla bla">
+        <meta name="description" content="Q is an activity tracking and stats tool.">
         <meta name="viewport" content="width=device-width">
 
         <meta name="twitter:card" content="summary_large_image">
         
-        <meta name="twitter:title" content="November activity count">
-        <meta name="twitter:description" content="Qapp is an bla bla bla bla bla">
+        <meta name="twitter:title" content="<?php echo strtoupper(date("F"));?> activity count">
+        <meta name="twitter:description" content="Q is an activity tracking and stats tool.">
         <meta name="twitter:creator" content="@sithdown">
-        <meta name="twitter:image:src" content="http://sithdown.dyndns.org/test/github/Q/graph.php">
+        <meta name="twitter:image:src" content="http://sithdown.es/Q/graph/?user=<?php echo $username;?>&rng=<?php echo time();?>">
 
         <link rel="stylesheet" href="css/normalize.min.css">
         <link rel="stylesheet" href="css/bootstrap.min.css">
@@ -90,6 +90,8 @@ $daytotals = getDayTotal();
         <link rel="stylesheet" href="css/bootstrap-select.min.css">
         <link rel="stylesheet" href="css/bootstrap-tagsinput.css">
         <link rel="stylesheet" href="css/font-awesome.min.css">
+
+        <link rel="icon" type="image/png" href="qlogo.png">
 
         <link rel="stylesheet" href="css/app.css">
 
@@ -128,8 +130,17 @@ $daytotals = getDayTotal();
                         <i class="fa fa-cog fa-lg"></i>
                     </a>
                     <ul class="dropdown-menu" role="menu" aria-labelledby="drop-settings">
+                        <!--
                         <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Toggle greedy search</a></li>
                         <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Reset statistics</a></li>
+                        -->
+                        <li role="presentation"><a role="menuitem" tabindex="-1" target="_blank" href="graph/?user=<?php echo $username; ?>">Share graph image</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" target="_blank" href="<?php echo "http://". $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/?user=".$username; ?>">Share interactive graph</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://twitter.com/share" class="twitter-share-button" data-url="<?php echo "http://". $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/?user=".$username; ?>" data-text="<?php echo $username; ?>'s activity so far:" data-count="none">Share on Twitter</a>
+                        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+                        </li>
+
+
                         <li role="presentation" class="divider"></li>
                         <li role="presentation"><a role="menuitem" tabindex="-1" href="oauth/logout.php">Logout</a></li>
                     </ul>
@@ -203,7 +214,19 @@ $daytotals = getDayTotal();
                                     <div class="col-md-4">
                                         <input spellcheck="false" autocomplete="off" autocapitalize="off" type="text" class="col-md-4 form-control" name="tags" id="tags" data-role="tagsinput"></input>
                                     </div>
-                                    <div class="col-md-4" id="exampletags"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-offset-4 col-md-4">
+                                        <div class="btn-group btn-block" data-toggle="buttons">
+                                        <label class="btn btn-danger active col-md-6">
+                                        <input type="radio" name="priv" value="public" checked> Public
+                                        </label>
+                                        <label class="btn btn-danger col-md-6">
+                                        <input type="radio" name="priv" value="private"> Private
+                                        </label>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="form-group">
@@ -313,7 +336,10 @@ $daytotals = getDayTotal();
         </script>
 
         <script id="template-pbar-v" type="text/x-handlebars-template">
-            <div class='progress vertical bottom'><div title='{{title}}' onclick="searchDay('{{day}}')" data-toggle='tooltip' class='progress-bar progress-bar-danger' aria-valuetransitiongoal='{{percent}}'></div></div>
+            <div class='progress vertical bottom'>
+                <div title='{{title}}' onclick="searchDay('{{day}}')" data-toggle='tooltip' class='progress-bar progress-bar-danger' aria-valuetransitiongoal='{{percent}}'></div>
+                <span class='{{c}}'>{{monthday}}</span>
+            </div>
         </script>
 
         <script id="template-thead" type="text/x-handlebars-template">

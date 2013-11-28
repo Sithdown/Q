@@ -14,7 +14,7 @@ $config = array(
  * eg. if Opauth is reached via http://example.org/auth/, path is '/auth/'
  * if Opauth is reached via http://auth.example.org/, path is '/'
  */
-	'path' => '/Q/oauth/',
+	'path' => '/test/github/Q/oauth/',
 
 /**
  * Uncomment if you would like to view debug messages
@@ -39,7 +39,7 @@ $config = array(
 /**
  * A random string used for signing of $auth response.
  */
-	'security_salt' => 'culoz',
+	'security_salt' => 'culoooz',
 	
 /**
  * Higher value, better security, slower hashing;
@@ -74,10 +74,14 @@ $config = array(
  */
 	'Strategy' => array(
 		// Define strategies and their respective configs here
+		'Google' => array(
+			'client_id' => '206115866522.apps.googleusercontent.com',
+    		'client_secret' => 'aMWOcAX2fWecuLPEmWgbPg6o'
+    	),
 
     	'Twitter' => array(
-			'key' => '',
-			'secret' => ''
+			'key' => '2q2dhH0R1yKPUfAZE9Foaw',
+			'secret' => '6vUDWmoeMRRy8qra6rVBZvXjtTcl81La78ribZliXPc'
 		),
 	),
 );

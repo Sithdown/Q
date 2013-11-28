@@ -422,6 +422,8 @@ function createBarInsight(js){
  */
 function createBarGraph(js){
 
+    console.log(js);
+
     var brs = "";
     var j = 0;
     for (var i = 0; i < 31; i++) {
@@ -429,7 +431,15 @@ function createBarGraph(js){
         if(js[j]!==undefined){
             if((js[j]["monthday"]-1)==i){
 
-                brs+= temp_pbar_v({title:pTime(js[j]['duration_total']),day:js[j]["date"],percent:(js[j]['duration_total']/(1440-480)*100)});
+                var c = "";
+                if(js[j]["monthday"]%5==0){
+                    c+="number";
+                }
+                if(js[j]["monthday"]>9){
+                    c+=" double";
+                }
+
+                brs+= temp_pbar_v({c:c,monthday:js[j]['monthday'],title:pTime(js[j]['duration_total']),day:js[j]["date"],percent:(js[j]['duration_total']/(1440-480)*100)});
 
                 j+=1;
             }
@@ -532,6 +542,8 @@ function createResultsTable(json,options,args){
             var ag = "list.php?daytotals=true&"+args;  
         }
 
+        console.log(ag);
+
         var daytotals = $.getJSON( ag, { } )
         .done(function( js ) {
 
@@ -548,7 +560,7 @@ function createResultsTable(json,options,args){
             $('.progress-bar').tooltip({container:'body',placement:'bottom'});
             $('td').tooltip({container:'#stats',placement:'bottom'});
 
-            if(args.indexOf("date=")!=-11){
+            if(args.indexOf("date=")!=-1){
                 //Get context with jQuery - using jQuery's .get() method.
                 var ctx = $("#myChart").get(0).getContext("2d");
                 //This will get the first returned node in the jQuery collection.
@@ -735,7 +747,7 @@ function loadStatsReal(options){
 
     //$("#stats").html('<div class="col-md-1 col-md-offset-5" style="text-align:center;padding-top:100px;"><i class="fa fa-refresh fa-5x fa-spin"></i></div>');
 
-    console.log("list.php?"+args);
+    console.log(args);
 
     $.getJSON( "list.php?"+args, { } )
       .done(function( json ) {

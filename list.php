@@ -9,16 +9,35 @@ if(isset($_SESSION['userid'])){
     $uname = " - ".$username;
     $showprivate = true;
 }
+if(isset($_GET["userid"])){
+    $userid=$_GET["userid"];
+}
+if(isset($_GET["user"])){
+	$userid=getID($_GET["user"]);
+	$username = $user;
+	$uname = " - ".$username;
+}
 
 require_once "connection.php";
 
 echo json_encode(matchCriteria());
+
+function getID($name){
+	global $pdo;
+	$insert = 'SELECT ID FROM users WHERE name="'.$name.'"';
+    $ready = $pdo->prepare($insert);
+    $ready->execute();
+    $result = $ready->fetchAll();
+    return $result[0]["ID"];
+}
 
 function aQuery($select,$append,$gets=null){
 	global $pdo,$showprivate,$userid;
 
 	// apaño
 	$gets['private'] = 0;
+
+	$gets['userid'] = $userid;
 
 	if($gets!==null){
 		$sql=array();
@@ -117,27 +136,17 @@ function aQuery($select,$append,$gets=null){
 		$insert = $select.$a.join(' AND ',$sql);
 
 		if(isset($terms)){
-			$a = stringSearch("description",$terms,$paramArray,"or");
+			/*
+			$a = stringSearch("description",$terms,$paramArray,"and");
 			$insert.=$a[0];
 			$paramArray = $a[1];
 
 			$a = stringSearch("tags",$terms,$paramArray,"or");
 			$insert.=$a[0];
 			$paramArray = $a[1];
-		}
+			*/
 
-		if(isset($description)){
-			$a = stringSearch("description",$description,$paramArray,"or");
-			$insert.=$a[0];
-			$paramArray = $a[1];
-		}
-
-		if(isset($tags)){
-			$w=true;
-			if(isset($terms)){
-				$w = "or";
-			}
-			$a = stringSearch("tags",$tags,$paramArray,"or");
+			$a = orgroup(array("description","tags"),$terms,$paramArray);
 			$insert.=$a[0];
 			$paramArray = $a[1];
 		}
@@ -186,8 +195,8 @@ function getActivityByWeekDay($gets=null){
 }
 
 function getAllTags($gets=null){
-	global $pdo;
-	$ready = $pdo->prepare("SELECT tag FROM tags ORDER BY tag ASC");
+	global $pdo, $userid;
+	$ready = $pdo->prepare("SELECT tag FROM tags WHERE userid = ".$userid." ORDER BY tag ASC");
 	$ready->execute();
 	$result = $ready->fetchAll();
 	$r = array();
@@ -275,6 +284,35 @@ function getMonthTotals($gets=null){
     return $result;
 }
 
+function orgroup($fields=array(), $array=array(), $p=array()){
+	$r="";
+	$r.=" AND (";
+
+	mb_internal_encoding("UTF-8");
+	mb_regex_encoding("UTF-8");
+
+	foreach ($fields as $k => $field) {
+		if($k!=0){
+			$r.=" OR ";
+		}
+		foreach ($array as $key => $value) {
+			if($key!=0){
+				$r.=" OR ";
+			}
+			$r.=$field." LIKE :".strtolower($field).$key;
+			$p[':'.strtolower($field).$key] = '%'.$value.'%';
+
+		}
+	}
+
+	$r.=" ) ";
+
+	$a = array($r,$p);
+
+	return $a;
+
+}
+
 function stringSearch($field="", $array=array(), $p=array(),$startand=false){
 	$r="";
 	if($startand===true){
@@ -315,7 +353,7 @@ function stringSearch($field="", $array=array(), $p=array(),$startand=false){
 }
 
 function matchCriteria() {
-	global $pdo, $showprivate;
+	global $pdo, $showprivate, $userid;
 	$sql=array();
 	$paramArray=array();
 	$something = false;
@@ -323,6 +361,7 @@ function matchCriteria() {
 
 	$gets = $_GET;
 
+	$gets['userid'] = $userid;
 	$gets['private'] = 0;
 
 	if(isset($gets['getalltags'])){
@@ -444,11 +483,7 @@ function matchCriteria() {
 	$insert = 'SELECT * FROM logs'.(count($paramArray)>0 ? ' WHERE '.join(' AND ',$sql) : '');
 
 	if(isset($terms)){
-		$a = stringSearch("description",$terms,$paramArray);
-		$insert.=$a[0];
-		$paramArray = $a[1];
-
-		$a = stringSearch("tags",$terms,$paramArray,"or");
+		$a = orgroup(array("description","tags"),$terms,$paramArray);
 		$insert.=$a[0];
 		$paramArray = $a[1];
 	}

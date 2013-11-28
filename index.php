@@ -4,12 +4,29 @@ require_once "connection.php";
 
 $uname = "";
 $showprivate = false;
-$userid=1;
-session_start();
+$userid=0;
 if(isset($_SESSION['userid'])){
     $userid = $_SESSION['userid'];
     $username = $_SESSION['username'];
     $uname = " - ".$username;
+    $showprivate = true;
+}
+if(isset($_GET["userid"])){
+    $userid=$_GET["userid"];
+}
+if(isset($_GET["user"])){
+    $userid=getID($_GET["user"]);
+    $username = $user;
+    $uname = " - ".$username;
+}
+
+function getID($name){
+    global $pdo;
+    $insert = 'SELECT ID FROM users WHERE name="'.$name.'"';
+    $ready = $pdo->prepare($insert);
+    $ready->execute();
+    $result = $ready->fetchAll();
+    return $result[0]["ID"];
 }
 
 
@@ -69,15 +86,15 @@ $daytotals = getDayTotal();
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <title>Qapp<?php echo $uname;?></title>
-        <meta name="description" content="Qapp is an bla bla bla bla bla">
+        <meta name="description" content="Q is an activity tracking and stats tool.">
         <meta name="viewport" content="width=device-width">
 
         <meta name="twitter:card" content="summary_large_image">
         
-        <meta name="twitter:title" content="November activity count">
-        <meta name="twitter:description" content="Qapp is an bla bla bla bla bla">
+        <meta name="twitter:title" content="<?php echo strtoupper(date("F"));?> activity count">
+        <meta name="twitter:description" content="Q is an activity tracking and stats tool.">
         <meta name="twitter:creator" content="@sithdown">
-        <meta name="twitter:image:src" content="http://sithdown.dyndns.org/test/github/Q/graph.php">
+        <meta name="twitter:image:src" content="http://sithdown.es/Q/graph/?user=<?php echo $username;?>&rng=<?php echo time();?>">
 
         <link rel="stylesheet" href="css/normalize.min.css">
         <link rel="stylesheet" href="css/bootstrap.min.css">
@@ -89,6 +106,8 @@ $daytotals = getDayTotal();
         <link rel="stylesheet" href="css/bootstrap-select.min.css">
         <link rel="stylesheet" href="css/bootstrap-tagsinput.css">
         <link rel="stylesheet" href="css/font-awesome.min.css">
+
+        <link rel="icon" type="image/png" href="qlogo.png">
 
         <link rel="stylesheet" href="css/app.css">
 
@@ -126,6 +145,17 @@ $daytotals = getDayTotal();
                         <i class="fa fa-cog fa-lg"></i>
                     </a>
                     <ul class="dropdown-menu" role="menu" aria-labelledby="drop-settings">
+                        <?php if($username!=""){?>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" target="_blank" href="graph/?user=<?php echo $username; ?>">Share graph image</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" target="_blank" href="<?php echo "http://". $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/?user=".$username; ?>">Share interactive graph</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://twitter.com/share" class="twitter-share-button" data-url="<?php echo "http://". $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/?user=".$username; ?>" data-text="<?php echo $username; ?>'s activity so far:" data-count="none">Share on Twitter</a>
+                        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+                        </li>
+
+
+                        <li role="presentation" class="divider"></li>
+                        <?php } ?>
+
                         <li role="presentation"><a role="menuitem" tabindex="-1" href="oauth/twitter">Login</a></li>
                     </ul>
                 </li>
@@ -233,7 +263,10 @@ $daytotals = getDayTotal();
         </script>
 
         <script id="template-pbar-v" type="text/x-handlebars-template">
-            <div class='progress vertical bottom'><div title='{{title}}' onclick="searchDay('{{day}}')" data-toggle='tooltip' class='progress-bar progress-bar-danger' aria-valuetransitiongoal='{{percent}}'></div></div>
+            <div class='progress vertical bottom'>
+                <div title='{{title}}' onclick="searchDay('{{day}}')" data-toggle='tooltip' class='progress-bar progress-bar-danger' aria-valuetransitiongoal='{{percent}}'></div>
+                <span class='{{c}}'>{{monthday}}</span>
+            </div>
         </script>
 
         <script id="template-thead" type="text/x-handlebars-template">

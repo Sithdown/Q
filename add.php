@@ -44,9 +44,9 @@ function add() {
 					$tagID = $rst[0]["ID"];
 				}
 				else{ //NEW TAG
-					$ins = "INSERT INTO tags (`ID`,`tag`) VALUES (NULL, :tag)";
+					$ins = "INSERT INTO tags (`ID`,`tag`, `userid`) VALUES (NULL, :tag, :userid)";
 					$rdy = $pdo->prepare($ins);
-					$rdy->execute(array("tag"=>$tag));
+					$rdy->execute(array("tag"=>$tag,"userid"=>$userid));
 					$tagID = $pdo->lastInsertId();
 				}
 				$ins = "INSERT INTO log_tags (`ID`,`tag_id`,`log_id`) VALUES (NULL, :tagid, :logid)";
@@ -62,6 +62,14 @@ function add() {
 function prepareData($object,$ins){
 	if(!isset($object["private"])){
 		$object["private"] = false;
+	}
+	else{
+		if($object["private"]==true){
+			$object["private"]=1;
+		}
+		else{
+			$object["private"]=0;
+		}
 	}
 	$result = array(
 		":datetime" => $object["datetime"],
