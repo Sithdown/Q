@@ -316,6 +316,43 @@ function createBarGraph(js){
 
 /**
  * Description
+ * @method createResumeInfo
+ * @param {Object} options
+ * @param {Object} moods
+ * @return 
+ */
+function createResumeInfo(js){
+
+    var brs = "";
+    var j = 0;
+
+    var days = [0,0,0,0,0,0,0];
+    var total = 0;
+
+    function sumWeekDayTime(date, time){
+        var k = new Date(date);
+        days[k.getDay()] += parseInt(time);
+    }
+
+    var day = [];
+    for (var i = 0; i < 31; i++) {
+
+        if(js[j]!==undefined){
+            if((js[j]["monthday"]-1)==i){
+
+                sumWeekDayTime(js[j]['date'],js[j]['duration_total']);
+                total+=parseInt(js[j]['duration_total']);
+
+                j+=1;
+            }
+        }
+    };
+    return "<div class='table-responsive'><table class='col-md-4 table table-striped' style='text-align:center;padding-top:100px;background-color:#FAFAFA;'><thead><tr><td><h2>Monday</h2></td><td><h2>Tuesday</h2></td><td><h2>Wednesday</h2></td><td><h2>Thursday</h2></td><td><h2>Friday</h2></td><td><h2>Saturday</h2></td><td><h2>Sunday</h2></td></tr></thead><tbody><tr><td>"+pTime(days[1])+"</td><td>"+pTime(days[2])+"</td><td>"+pTime(days[3])+"</td><td>"+pTime(days[4])+"</td><td>"+pTime(days[5])+"</td><td>"+pTime(days[6])+"</td><td>"+pTime(days[0])+"</td></tr><tr><td>"+Math.round(days[1]/(1440-480)*25)+"%</td><td>"+Math.round(days[2]/(1440-480)*25)+"%</td><td>"+Math.round(days[3]/(1440-480)*25)+"%</td><td>"+Math.round(days[4]/(1440-480)*25)+"%</td><td>"+Math.round(days[5]/(1440-480)*25)+"%</td><td>"+Math.round(days[6]/(1440-480)*25)+"%</td><td>"+Math.round(days[0]/(1440-480)*25)+"%</td></tr></tbody><thead><tr><td colspan='7'><h2>"+pTime(total)+" ("+Math.round((total/(1440-480)*100)/31)+"%)</h2></td></tr></thead></table></div>";
+
+}
+
+/**
+ * Description
  * @method createResultsTable
  * @param {Object} json
  * @param {Object} options
@@ -401,10 +438,10 @@ function createResultsTable(json,options,args){
             var ag = "list.php?daytotals=true&"+args;  
         }
 
-        console.log(ag);
-
         var daytotals = $.getJSON( ag, { } )
         .done(function( js ) {
+
+            var xtra = '';
 
             var bread = createBreadCrumb(options,moods);
             if(args.indexOf("date=")!==-1){
@@ -412,9 +449,10 @@ function createResultsTable(json,options,args){
             }
             else{
                 var bars = createBarGraph(js);
+                xtra = createResumeInfo(js);
             }
 
-            $("#stats").html(bread+bars+'<div class="table-responsive"><table class="col-md-4 table table-striped" style="text-align:center;padding-top:100px;background-color:#FAFAFA;">'+items.join( "" )+'</tbody></table></div>');
+            $("#stats").html(bread+bars+xtra+'<div class="table-responsive"><table class="col-md-4 table table-striped" style="text-align:center;padding-top:100px;background-color:#FAFAFA;">'+items.join( "" )+'</tbody></table></div>');
             $('.progress-bar').progressbar();
             $('.progress-bar').tooltip({container:'body',placement:'bottom'});
             $('td').tooltip({container:'#stats',placement:'bottom'});

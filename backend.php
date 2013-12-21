@@ -13,6 +13,14 @@ if(isset($_SESSION['userid'])){
     $uname = " - ".$username;
     $showprivate = true;
 }
+else{
+    if(isset($_COOKIE["Qapp_userid"])){
+        $userid = $_COOKIE["Qapp_userid"];
+        $username = $_COOKIE["Qapp_username"];
+        $uname = " - ".$username;
+        $showprivate = true;
+    }
+}
 
 function getData($data){
 
